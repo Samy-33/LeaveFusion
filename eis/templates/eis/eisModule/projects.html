@@ -126,7 +126,20 @@
         </form>
         <br>
         <h4 class="ui dividing header">Report:</h4>
+        <div class="ui pointing pagination menu">
+                {% for project in projects %}
+                {% if forloop.counter0|divisibleby:10 %}
+                    <span align="right>"><a class="{% if forloop.counter0 == 0 %}active {% endif %}item" data-tab="project-{{ forloop.counter0 }}">
+                        {% widthratio forloop.counter|add:10 10 1 %}
+     </a></span>
+                {% endif %}
+                {% endfor %}
 
+            </div>
+     {% for project in projects %}
+
+            {% if forloop.counter0|divisibleby:10 %}
+            <div class="ui {% if forloop.counter0 == 0 %}active {% endif %} tab segment" data-tab="project-{{ forloop.counter0 }}">
         <table class="ui fixed sortable celled table">
             <thead>
             <tr>
@@ -150,7 +163,7 @@
             </thead>
 
             <tbody>
-            {% for project in projects %}
+            {% endif %}
             <tr>
                 <td id="research{{ forloop.counter }}Z"><div style="display: none;">{{ project.id }}</div>{{ forloop.counter }}.</td>
                 <td id="research{{ forloop.counter }}A"><b>PI: </b>{{ project.pi }}<br><b>Co-PI: </b>{{ project.co_pi }}</td>
@@ -167,27 +180,17 @@
                 <td> <a onclick="updateRESEARCH({{ forloop.counter }})"><i id="bt" class="edit icon" style="font-size:1.3vw ; color:blue;"></i></a><br><a class="centered raised item" href="{% url 'eis:emp_research_projectsDelete' project.id %}"><i id="bt" class="trash outline icon" style="font-size:1.3vw; color:red;"></i><br>
                 </a>  </td>
             </tr>
-            {% endfor %}
+            {% if forloop.counter0|add:1|divisibleby:10 %}
             </tbody>
-
-            <tfoot>
-            <tr>
-                <th colspan="7">
-                    <div class="ui right floated pagination menu">
-                        <a class="icon item">
-                            <i class="left chevron icon"></i>
-                        </a>
-                        <a class="item">1</a>
-                        <a class="item">2</a>
-                        <a class="item">3</a>
-                        <a class="item">4</a>
-                        <a class="icon item">
-                            <i class="right chevron icon"></i>
-                        </a>
-                    </div>
-                </th>
-            </tr></tfoot>
         </table>
+    </div>
+          {% endif %}
+            {% endfor %}
+     {% if not projects.all.count|divisibleby:10 %}
+     </tbody>
+        </table>
+            </div>
+ {% endif %}
     </div>
 
     {% comment %}The Research project segment ends here!{% endcomment %}
@@ -266,7 +269,20 @@
         </form>
         <br>
         <h4 class="ui dividing header">Report:</h4>
+        <div class="ui pointing pagination menu">
+                {% for consult in consultancy %}
+                {% if forloop.counter0|divisibleby:10 %}
+                    <span align="right>"><a class="{% if forloop.counter0 == 0 %}active {% endif %}item" data-tab="consult-{{ forloop.counter0 }}">
+                        {% widthratio forloop.counter|add:10 10 1 %}
+     </a></span>
+                {% endif %}
+                {% endfor %}
 
+            </div>
+     {% for consult in consultancy %}
+
+            {% if forloop.counter0|divisibleby:10 %}
+            <div class="ui {% if forloop.counter0 == 0 %}active {% endif %} tab segment" data-tab="consult-{{ forloop.counter0 }}">
         <table class="ui fixed sortable celled table">
             <thead>
             <tr>
@@ -291,7 +307,7 @@
             </thead>
 
             <tbody>
-            {% for consult in consultancy %}
+            {% endif %}
             <tr id="r1">
                  <td id="consultancy{{ forloop.counter }}Z"><div style="display: none;">{{ consult.id }}</div>{{ forloop.counter }}.</td>
                  <td id="consultancy{{ forloop.counter }}A">{{ consult.consultants }}</td>
@@ -301,28 +317,17 @@
                  <td id="consultancy{{ forloop.counter }}E">From: {{ consult.start_date }}<br/>To: {{ consult.end_date }}</td>
                 <td><a onclick="updateCONSULTANCY({{ forloop.counter }})"><i id="bt" class="edit icon" style="font-size:1.3vw ; color:blue;"></i></a><br><a class="centered raised item" href="{% url 'eis:emp_consultancy_projectsDelete' consult.id %}"><i id="bt" class="trash outline icon" style="font-size:1.3vw; color:red;"></i> </a> </td>
             </tr>
-            {% endfor %}
-
+            {% if forloop.counter0|add:1|divisibleby:10 %}
             </tbody>
-
-            <tfoot>
-            <tr>
-                <th colspan="7">
-                    <div class="ui right floated pagination menu">
-                        <a class="icon item">
-                            <i class="left chevron icon"></i>
-                        </a>
-                        <a class="item">1</a>
-                        <a class="item">2</a>
-                        <a class="item">3</a>
-                        <a class="item">4</a>
-                        <a class="icon item">
-                            <i class="right chevron icon"></i>
-                        </a>
-                    </div>
-                </th>
-            </tr></tfoot>
         </table>
+    </div>
+          {% endif %}
+            {% endfor %}
+     {% if not consultancy.all.count|divisibleby:10 %}
+     </tbody>
+        </table>
+            </div>
+ {% endif %}
     </div>
     {% comment %}The Consultancy Project ends here!{% endcomment %}
 
@@ -330,7 +335,7 @@
     {% comment %}The Patent segment starts here!{% endcomment %}
     <div class="ui tab segment" data-tab="patents">
         <h4 class="ui dividing header" id="changes10">Add a  Patent</h4>
-        <form class="ui form"  method="post" action="{% url 'eis:patent_insert' %}">
+        <form class="ui form"  method="post" action="{% url 'eis:patent_insert' %}"  onsubmit="return validatepatent()">
             {% csrf_token %}
             <div style="display: none;"> <input type="text" id="patentZ" name="patent_id"></div>
             <div class="field">
@@ -371,7 +376,7 @@
             <div class="field">
                 <label>Earning(in Rs.)</label>
                 <div class="fields">
-                    <div class="twelve wide field">
+                    <div class="seven wide field">
                         <input placeholder="Publisher" id="patentE" type="number" name="earnings" required>
                     </div>
 
@@ -399,6 +404,18 @@
                                 <div class="item" data-value="2002">2002</div>
                                 <div class="item" data-value="2001">2001</div>
                                 <div class="item" data-value="2000">2000</div>
+                            </div>
+                        </div>
+                    </div>
+                          <div class="four wide field">
+                              <div class="ui fluid search selection dropdown">
+                            <input type="hidden" name="month"  id="patentX"  required>
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Select Month</div>
+                            <div class="menu">
+                               {% for i in "xxxxxxxxxxxx" %}
+                                <div class="item" data-value="{{ forloop.counter }}">{{ forloop.counter }}</div>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
@@ -454,30 +471,12 @@
                  <td id="patent{{ forloop.counter }}A">{{ patent.p_no }}</td>
                  <td id="patent{{ forloop.counter }}B">{{ patent.title }}</td>
                  <td id="patent{{ forloop.counter }}C">{{ patent.status }}</td>
-                 <td id="patent{{ forloop.counter }}D">{{ patent.p_year }}</td>
+                 <td id="patent{{ forloop.counter }}D">{{ patent.a_month }}/{{ patent.p_year }}</td>
                  <td id="patent{{ forloop.counter }}E">{{ patent.earnings }}</td>
                 <td><a onclick="updatePATENT({{ forloop.counter }})"><i id="bt" class="edit icon" style="font-size:1.3vw ; color:blue;"></i></a><br><a class="centered raised item" href="{% url 'eis:emp_patentsDelete' patent.id %}"><i id="bt" class="trash outline icon" style="font-size:1.3vw; color:red;"></i> </a> </td>
             </tr>
             {% endfor %}
             </tbody>
-
-            <tfoot>
-            <tr>
-                <th colspan="7">
-                    <div class="ui right floated pagination menu">
-                        <a class="icon item">
-                            <i class="left chevron icon"></i>
-                        </a>
-                        <a class="item">1</a>
-                        <a class="item">2</a>
-                        <a class="item">3</a>
-                        <a class="item">4</a>
-                        <a class="icon item">
-                            <i class="right chevron icon"></i>
-                        </a>
-                    </div>
-                </th>
-            </tr></tfoot>
         </table>
     </div>
 
@@ -534,24 +533,6 @@
             </tr>
             {% endfor %}
             </tbody>
-
-            <tfoot>
-            <tr>
-                <th colspan="7">
-                    <div class="ui right floated pagination menu">
-                        <a class="icon item">
-                            <i class="left chevron icon"></i>
-                        </a>
-                        <a class="item">1</a>
-                        <a class="item">2</a>
-                        <a class="item">3</a>
-                        <a class="item">4</a>
-                        <a class="icon item">
-                            <i class="right chevron icon"></i>
-                        </a>
-                    </div>
-                </th>
-            </tr></tfoot>
         </table>
     </div>
     {% comment %}The Technology segment ends here!{% endcomment %}

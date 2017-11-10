@@ -326,7 +326,20 @@
         </form>
         <br>
         <h4 class="ui dividing header">Report:</h4>
+        <div class="ui pointing pagination menu">
+                {% for fvisit in fvisits %}
+                {% if forloop.counter0|divisibleby:10 %}
+                    <span align="right>"><a class="{% if forloop.counter0 == 0 %}active {% endif %}item" data-tab="fvisit-{{ forloop.counter0 }}">
+                        {% widthratio forloop.counter|add:10 10 1 %}
+     </a></span>
+                {% endif %}
+                {% endfor %}
 
+            </div>
+     {% for fvisit in fvisits %}
+
+            {% if forloop.counter0|divisibleby:10 %}
+            <div class="ui {% if forloop.counter0 == 0 %}active {% endif %} tab segment" data-tab="fvisit-{{ forloop.counter0 }}">
         <table class="ui fixed sortable celled table">
             <thead>
             <tr>
@@ -347,7 +360,7 @@
             </thead>
 
             <tbody>
-            {% for fvisit in fvisits %}
+            {% endif %}
             <tr id="r1">
                 <td id="fvisits{{ forloop.counter }}Z"><div style="display: none;">{{ fvisit.id }}</div>{{ forloop.counter }}.</td>
                 <td id="fvisits{{ forloop.counter }}A">
@@ -357,28 +370,19 @@
                 <td id="fvisits{{ forloop.counter }}C">{{ fvisit.start_date }} - {{ fvisit.end_date }}</td>
                 <td id="fvisits{{ forloop.counter }}D">{{ fvisit.purpose }}</td>
                  <td><a onclick="updateFVISITS({{ forloop.counter }})"><i id="bt" class="edit icon" style="font-size:1.3vw;color:blue"></i></a><br><a class="centered raised item" href="{% url 'eis:emp_visitsDelete' fvisit.id %}"><i id="bt" class="trash outline icon" style="font-size:1.3vw;color:red;"></i> </a></td>
-            </tr>  {% endfor %}
+            </tr>              {% if forloop.counter0|add:1|divisibleby:10 %}
+
 
             </tbody>
-
-            <tfoot>
-            <tr>
-                <th colspan="6">
-                    <div class="ui right floated pagination menu">
-                        <a class="icon item">
-                            <i class="left chevron icon"></i>
-                        </a>
-                        <a class="item">1</a>
-                        <a class="item">2</a>
-                        <a class="item">3</a>
-                        <a class="item">4</a>
-                        <a class="icon item">
-                            <i class="right chevron icon"></i>
-                        </a>
-                    </div>
-                </th>
-            </tr></tfoot>
         </table>
+    </div>
+          {% endif %}
+            {% endfor %}
+     {% if not fvisits.all.count|divisibleby:10 %}
+     </tbody>
+        </table>
+            </div>
+ {% endif %}
     </div>
     {% comment %}The Foreign Visit segment ends here!{% endcomment %}
 
@@ -448,7 +452,20 @@
         </form>
         <br>
         <h4 class="ui dividing header">Report:</h4>
+        <div class="ui pointing pagination menu">
+                {% for ivisit in ivisits %}
+                {% if forloop.counter0|divisibleby:10 %}
+                    <span align="right>"><a class="{% if forloop.counter0 == 0 %}active {% endif %}item" data-tab="ivisit-{{ forloop.counter0 }}">
+                        {% widthratio forloop.counter|add:10 10 1 %}
+     </a></span>
+                {% endif %}
+                {% endfor %}
 
+            </div>
+     {% for ivisit in ivisits %}
+
+            {% if forloop.counter0|divisibleby:10 %}
+            <div class="ui {% if forloop.counter0 == 0 %}active {% endif %} tab segment" data-tab="ivisit-{{ forloop.counter0 }}">
         <table class="ui fixed sortable celled table">
             <thead>
             <tr>
@@ -463,7 +480,7 @@
             </thead>
 
             <tbody>
-            {% for ivisit in ivisits %}
+            {% endif %}
             <tr id="r2">
                 <td id="ivisits{{ forloop.counter }}Z"><div style="display: none;">{{ ivisit.id }}</div>{{ forloop.counter }}.</td>
                 <td id="ivisits{{ forloop.counter }}A">{{ ivisit.place }}</td>
@@ -472,29 +489,19 @@
 
                <td><a onclick="updateIVISITS({{ forloop.counter }})"><i id="bt" class="edit icon" style="font-size:1.3vw;color:blue"></i></a><br><a class="centered raised item" href="{% url 'eis:emp_visitsDelete' ivisit.id %}"><i id="bt" class="trash outline icon" style="font-size:1.3vw;color:red;"></i></a> </td>
             </tr>
-{% endfor %}
+            {% if forloop.counter0|add:1|divisibleby:10 %}
 
 
             </tbody>
-
-            <tfoot>
-            <tr>
-                <th colspan="6">
-                    <div class="ui right floated pagination menu">
-                        <a class="icon item">
-                            <i class="left chevron icon"></i>
-                        </a>
-                        <a class="item">1</a>
-                        <a class="item">2</a>
-                        <a class="item">3</a>
-                        <a class="item">4</a>
-                        <a class="icon item">
-                            <i class="right chevron icon"></i>
-                        </a>
-                    </div>
-                </th>
-            </tr></tfoot>
         </table>
+    </div>
+          {% endif %}
+            {% endfor %}
+     {% if not ivisits.all.count|divisibleby:10 %}
+     </tbody>
+        </table>
+            </div>
+ {% endif %}
     </div>
     {% comment %}The Indian University visit segment ends here!{% endcomment %}
 {% endblock %}

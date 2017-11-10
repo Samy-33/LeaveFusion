@@ -11,7 +11,7 @@
 
  <div class="ui active tab segment" data-tab="Conference/Symposium">
        <h4 class="ui dividing header" id="changes17">Add a Conference/Symposium</h4>
-          <form class="ui form"  method="post" action="{% url 'eis:consym_insert' %}">
+          <form class="ui form"  method="post" action="{% url 'eis:consym_insert' %}" onsubmit="return validatecon()">
             {% csrf_token %}
               <div style="display: none;"> <input type="text" id="confZ" name="conf_id"></div>
             <div class="field">
@@ -21,7 +21,7 @@
                          <!--  <input placeholder="Published" type="text"> -->
                         <!-- code change starts --> 
                               <div class="ui fluid search selection dropdown">
-                                <input type="hidden" name="role" required>
+                                <input type="hidden" name="role" required id="confY">
                                 <i class="dropdown icon"></i>
                                 <div class="default text">Role</div>
                                 <div class="menu">
@@ -168,11 +168,11 @@
             <tr>
                 <td id="conf{{ forloop.counter }}Z"><div style="display: none;">{{ consymp.id }}</div>{{ forloop.counter }}.</td>
                 {% if consymp.role1 == 'Any Other' %}
-                    <td>{{ consymp.role2 }}</td>
+                    <td id="conf{{ forloop.counter }}Y">{{ consymp.role2 }}</td>
                 {% elif consymp.role1 == 'Organised' %}
-                    <td>{{ consymp.role1 }}:<br> {{ consymp.role2 }}</td>
+                    <td id="conf{{ forloop.counter }}Y">{{ consymp.role1 }}: {{ consymp.role2 }}</td>
                 {% else %}
-                <td>{{ consymp.role1 }}</td>
+                <td id="conf{{ forloop.counter }}Y">{{ consymp.role1 }}</td>
                 {% endif %}
                 <td id="conf{{ forloop.counter }}A">{{ consymp.name }}</td>
                 <td id="conf{{ forloop.counter }}B">{{ consymp.venue }}</td>

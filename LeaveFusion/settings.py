@@ -25,7 +25,7 @@ SECRET_KEY = 'v0o)kux-3d_nigwc=bnq!josh)0ctcgxvjoao^jbquc8nulbg2'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['fusion.iiitdmj.ac.in']
 
 #Google authentication
 SOCIALACCOUNT_PROVIDERS = {
@@ -116,7 +116,7 @@ ROOT_URLCONF = 'LeaveFusion.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['/', 'templates'],
+        'DIRS': ['/', os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

@@ -422,6 +422,7 @@ def pg_insert(request):
     eis.pf_no = pf
     eis.title = request.POST.get('title')
     eis.s_year = request.POST.get('s_year')
+    eis.a_month = request.POST.get('month')
     eis.supervisors = request.POST.get('sup')
     eis.rollno = request.POST.get('roll')
     eis.s_name = request.POST.get('name')
@@ -441,6 +442,7 @@ def phd_insert(request):
     eis.degree_type = 2
     eis.title = request.POST.get('title')
     eis.s_year = request.POST.get('s_year')
+    eis.a_month = request.POST.get('month')
     eis.supervisors = request.POST.get('sup')
     eis.rollno = request.POST.get('roll')
     eis.s_name = request.POST.get('name')
@@ -515,6 +517,7 @@ def journal_insert(request):
     eis.page_no = request.POST.get('page')
     eis.is_sci = request.POST.get('sci')
     eis.year = request.POST.get('year')
+    eis.a_month = request.POST.get('month')
     eis.doc_id = request.POST.get('doc_id')
     eis.doc_description = request.POST.get('doc_description')
     eis.status = request.POST.get('status')
@@ -524,7 +527,10 @@ def journal_insert(request):
         try:
             eis.doi = datetime.datetime.strptime(request.POST.get('doi'), "%B %d, %Y")
         except:
-            eis.doi = datetime.datetime.strptime(request.POST.get('doi'), "%b. %d, %Y")
+            try:
+                eis.doi = datetime.datetime.strptime(request.POST.get('doi'), "%b. %d, %Y")
+            except:
+                eis.doi = request.POST.get('doi')
     if (request.POST.get('doa') != None and request.POST.get('doa') != '' and request.POST.get('doa') != 'None'):
         try:
             eis.date_acceptance = datetime.datetime.strptime(request.POST.get('doa'), "%B %d, %Y")
@@ -563,6 +569,7 @@ def confrence_insert(request):
     eis.is_sci = request.POST.get('sci')
     eis.issn_no = request.POST.get('isbn')
     eis.year = request.POST.get('year')
+    eis.a_month = request.POST.get('month')
     eis.doc_id = request.POST.get('doc_id')
     eis.doc_description = request.POST.get('doc_description')
     eis.status = request.POST.get('status')
@@ -605,7 +612,7 @@ def book_insert(request):
     eis.publisher = request.POST.get('publisher')
     eis.pyear = request.POST.get('year')
     eis.co_authors = request.POST.get('co_authors')
-
+    eis.a_month = request.POST.get('month')
     eis.save()
     return redirect('eis:profile')
 
@@ -613,7 +620,7 @@ def consym_insert(request):
     user = get_object_or_404(ExtraInfo, user=request.user)
     pf = user.unique_id
 
-    if (request.POST.get('fvisit_id')==None or request.POST.get('conf_id')==""):
+    if (request.POST.get('conf_id')==None or request.POST.get('conf_id')==""):
         eis = emp_confrence_organised()
     else:
         eis = get_object_or_404(emp_confrence_organised, id=request.POST.get('conf_id'))
@@ -832,6 +839,7 @@ def patent_insert(request):
     eis.title = request.POST.get('title')
     eis.p_year = request.POST.get('year')
     eis.status = request.POST.get('status')
+    eis.a_month = request.POST.get('month')
     eis.save()
     return redirect('eis:profile')
 
@@ -1569,7 +1577,7 @@ def render_to_pdf(template_src, context_dict):
     template = get_template(template_src)
     html = template.render(context_dict)
     result = BytesIO()
-    pdf = pisa.pisaDocument(BytesIO(html.encode("cp1252")), result)
+    pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
     if not pdf.err:
         return HttpResponse(result.getvalue(), content_type='application/pdf')
     return HttpResponse('We had some errors<pre>%s</pre>' % escape(html))
@@ -1581,71 +1589,74 @@ def generate_report(request):
     start = request.POST.get('syear')
     star_date = start+'-01-01'
     end = request.POST.get('lyear')
+    star = request.POST.get('smonth')
+    star_date = start + '-01-01'
+    en = request.POST.get('lmonth')
     if(request.POST.get('journal_select')=="journal"):
-        journal = emp_research_papers.objects.filter(pf_no=pf, rtype='Journal').filter(year__range=[start,end]).order_by('-year')
+        journal = emp_research_papers.objects.filter(pf_no=pf, rtype='Journal').filter(year__range=[start,end]).filter(a_month__range=[star,en]).order_by('-year')
         journal_req="1"
     else:
         journal=""
         journal_req="0"
 
     if (request.POST.get('conference_select') == "conference"):
-        conference = emp_research_papers.objects.filter(pf_no=pf, rtype='Conference').filter(year__range=[start,end]).order_by('-year')
+        conference = emp_research_papers.objects.filter(pf_no=pf, rtype='Conference').filter(year__range=[start,end]).filter(a_month__range=[star,en]).order_by('-year')
         conference_req = "1"
     else:
         conference=""
         conference_req = "0"
 
     if (request.POST.get('books_select') == "books"):
-        books = emp_published_books.objects.filter(pf_no=pf).filter(pyear__range=[start,end]).order_by('-pyear')
+        books = emp_published_books.objects.filter(pf_no=pf).filter(pyear__range=[start,end]).filter(a_month__range=[star,en]).order_by('-pyear')
         books_req = "1"
     else:
         books=""
         books_req = "0"
 
     if (request.POST.get('projects_select') == "projects"):
-        projects = emp_research_projects.objects.filter(pf_no=pf).filter(start_date__year__range=[start,end]).order_by('-start_date')
+        projects = emp_research_projects.objects.filter(pf_no=pf).filter(start_date__year__range=[start,end]).filter(start_date__month__range=[star,en]).order_by('-start_date')
         projects_req = "1"
     else:
         projects = ""
         projects_req = "0"
 
     if (request.POST.get('consultancy_select') == "consultancy"):
-        consultancy = emp_consultancy_projects.objects.filter(pf_no=pf).filter(start_date__year__range=[start,end]).order_by('-date_entry')
+        consultancy = emp_consultancy_projects.objects.filter(pf_no=pf).filter(start_date__year__range=[start,end]).filter(start_date__month__range=[star,en]).order_by('-date_entry')
         consultancy_req = "1"
     else:
         consultancy = ""
         consultancy_req = "0"
 
     if (request.POST.get('patents_select') == "patents"):
-        patents = emp_patents.objects.filter(pf_no=pf).filter(p_year__range=[start,end]).order_by('-date_entry')
+        patents = emp_patents.objects.filter(pf_no=pf).filter(p_year__range=[start,end]).filter(a_month__range=[star,en]).order_by('-date_entry')
         patents_req = "1"
     else:
         patents = ""
         patents_req = "0"
 
     if (request.POST.get('techtransfers_select') == "techtransfers"):
-        techtransfers = emp_techtransfer.objects.filter(pf_no=pf).filter(date_entry__year__range=[start,end]).order_by('-date_entry')
+        techtransfers = emp_techtransfer.objects.filter(pf_no=pf).filter(date_entry__year__range=[start,end]).filter(date_entry__month__range=[star,en]).order_by('-date_entry')
         techtransfers_req = "1"
     else:
         techtransfers=""
         techtransfers_req = "0"
 
     if (request.POST.get('mtechs_select') == "mtechs"):
-        mtechs = emp_mtechphd_thesis.objects.filter(pf_no=pf, degree_type=1).filter(s_year__range=[start,end]).order_by('-date_entry')
+        mtechs = emp_mtechphd_thesis.objects.filter(pf_no=pf, degree_type=1).filter(s_year__range=[start,end]).filter(a_month__range=[star,en]).order_by('-date_entry')
         mtechs_req = "1"
     else:
         mtechs=""
         mtechs_req = "0"
 
     if (request.POST.get('phds_select') == "phds"):
-        phds = emp_mtechphd_thesis.objects.filter(pf_no=pf, degree_type=2).filter(s_year__range=[start,end]).order_by('-date_entry')
+        phds = emp_mtechphd_thesis.objects.filter(pf_no=pf, degree_type=2).filter(s_year__range=[start,end]).filter(a_month__range=[star,en]).order_by('-date_entry')
         phds_req = "1"
     else:
         phds=""
         phds_req = "0"
 
     if (request.POST.get('fvisits_select') == "fvisits"):
-        fvisits = emp_visits.objects.filter(pf_no=pf, v_type=2).filter(start_date__year__range=[start,end]).order_by('-entry_date')
+        fvisits = emp_visits.objects.filter(pf_no=pf, v_type=2).filter(start_date__year__range=[start,end]).filter(start_date__month__range=[star,en]).order_by('-entry_date')
         fvisits_req = "1"
     else:
         fvisits=""
@@ -1899,7 +1910,7 @@ def generate_report(request):
     }
 
     if (request.POST.get('ivisits_select') == "ivisits"):
-        ivisits = emp_visits.objects.filter(pf_no=pf, v_type=1).filter(start_date__year__range=[start,end]).order_by('-entry_date')
+        ivisits = emp_visits.objects.filter(pf_no=pf, v_type=1).filter(start_date__year__range=[start,end]).filter(start_date__month__range=[star,en]).order_by('-entry_date')
         ivisits_req = "1"
     else:
         ivisits=""
@@ -1908,7 +1919,7 @@ def generate_report(request):
         fvisit.countryfull = countries[fvisit.country]
 
     if (request.POST.get('consymps_select') == "consymps"):
-        consymps = emp_confrence_organised.objects.filter(pf_no=pf).filter(start_date__year__range=[start,end]).order_by('-date_entry')
+        consymps = emp_confrence_organised.objects.filter(pf_no=pf).filter(start_date__year__range=[start,end]).filter(start_date__month__range=[star,en]).order_by('-date_entry')
         consymps_req = "1"
     else:
         consymps=""
@@ -1922,28 +1933,28 @@ def generate_report(request):
         awards_req = "0"
 
     if (request.POST.get('talks_select') == "talks"):
-        talks = emp_expert_lectures.objects.filter(pf_no=pf).filter(l_date__year__range=[start,end]).order_by('-date_entry')
+        talks = emp_expert_lectures.objects.filter(pf_no=pf).filter(l_date__year__range=[start,end]).filter(l_date__month__range=[star,en]).order_by('-date_entry')
         talks_req = "1"
     else:
         talks=""
         talks_req = "0"
 
     if (request.POST.get('chairs_select') == "chairs"):
-        chairs = emp_session_chair.objects.filter(pf_no=pf).filter(start_date__year__range=[start,end]).order_by('-date_entry')
+        chairs = emp_session_chair.objects.filter(pf_no=pf).filter(start_date__year__range=[start,end]).filter(start_date__month__range=[star,en]).order_by('-date_entry')
         chairs_req = "1"
     else:
         chairs=""
         chairs_req = "0"
 
     if (request.POST.get('keynotes_select') == "keynotes"):
-        keynotes = emp_keynote_address.objects.filter(pf_no=pf).filter(start_date__year__range=[start,end]).order_by('-date_entry')
+        keynotes = emp_keynote_address.objects.filter(pf_no=pf).filter(start_date__year__range=[start,end]).filter(start_date__month__range=[star,en]).order_by('-date_entry')
         keynotes_req = "1"
     else:
         keynotes=""
         keynotes_req = "0"
 
     if (request.POST.get('events_select') == "events"):
-        events = emp_event_organized.objects.filter(pf_no=pf).filter(start_date__year__range=[start,end]).order_by('-start_date')
+        events = emp_event_organized.objects.filter(pf_no=pf).filter(start_date__year__range=[start,end]).filter(start_date__month__range=[star,en]).order_by('-start_date')
         events_req = "1"
     else:
         events=""

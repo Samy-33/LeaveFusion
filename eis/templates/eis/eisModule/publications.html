@@ -22,7 +22,7 @@
 
     <div class="ui active tab segment" data-tab="journal">
         <h4 class="ui dividing header" id="changes5">Add a Journal</h4>
-        <form class="ui form"  method="post" action="{% url 'eis:journal_insert' %}">
+        <form class="ui form"  method="post" action="{% url 'eis:journal_insert' %}" onsubmit="return validatejournal()">
             {% csrf_token %}
             <div style="display: none;"> <input type="text" id="pubZ" name="pub_id"></div>
             <div class="field">
@@ -37,7 +37,7 @@
             <div class="field">
                 <label>Journal details</label>
                 <div class="fields">
-                    <div class="eight wide field">
+                    <div class="six wide field">
                         <input placeholder="Name of the Journal" type="text" name="name"  id="pubC"  required>
                     </div>
 
@@ -68,13 +68,26 @@
                             </div>
                         </div>
                     </div>
+
+                           <div class="four wide field">
+                              <div class="ui fluid search selection dropdown">
+                            <input type="hidden" name="month"  id="pubX"  required>
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Select Month</div>
+                            <div class="menu">
+                               {% for i in "xxxxxxxxxxxx" %}
+                                <div class="item" data-value="{{ forloop.counter }}">{{ forloop.counter }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="fields">
                     <div class="fourteen wide field">
                         <div class="field">
                             <label>Title</label>
-                            <input placeholder="Title" type="text" name="title"  id="pubB"  required>
+                            <input placeholder="Title" type="text" name="title"  id="pubB"  required >
                         </div>
                     </div>
 
@@ -129,22 +142,6 @@
                                   </div>
                                 </div>
 
-                                 <div class="  field">
-                                        <label>Status</label>
-                                        <!--<input placeholder="Status" type="text">-->
-                                           <div class="ui fluid search selection dropdown">
-                                            <input type="hidden"  name="status" id="pubJ">
-                                            <i class="dropdown icon"></i>
-                                            <div class="default text">Status</div>
-                                                <div class="menu">
-                                                    <div class="item" data-value="Accepted">Accepted</div>
-                                                    <div class="item" data-value="Rejected">Rejected</div>
-                                                    <div class="item" data-value="Communicated">Communicated</div>
-
-                                                </div>
-                                        </div>
-                               </div>
-
                                  <div class=" field">
                                 <label>SCI/SCIE</label>
                                      <div class="ui fluid search selection dropdown">
@@ -177,7 +174,20 @@
         </form>
         <br>
         <h4 class="ui dividing header">Report:</h4>
+        <div class="ui pointing pagination menu">
+                {% for j in journal %}
+                {% if forloop.counter0|divisibleby:10 %}
+                    <span align="right>"><a class="{% if forloop.counter0 == 0 %}active {% endif %}item" data-tab="j-{{ forloop.counter0 }}">
+                        {% widthratio forloop.counter|add:10 10 1 %}
+     </a></span>
+                {% endif %}
+                {% endfor %}
 
+            </div>
+     {% for j in journal %}
+
+            {% if forloop.counter0|divisibleby:10 %}
+            <div class="ui {% if forloop.counter0 == 0 %}active {% endif %} tab segment" data-tab="j-{{ forloop.counter0 }}">
         <table class="ui fixed sortable celled table">
             <thead>
             <tr>
@@ -193,7 +203,7 @@
             </thead>
 
             <tbody style="max-height: 100px; overflow-y: auto;">
-            {% for j in journal %}
+            {% endif %}
             <tr>
                 <td id="pub{{ forloop.counter }}Z"><div style="display: none;">{{ j.id }}</div>{{ forloop.counter }}.</td>
                 <td id="pub{{ forloop.counter }}A">{{ j.authors }}</td>
@@ -204,38 +214,25 @@
                                     <b>Paper Reference No. :</b> {{ j.reference_number }} <br>
                                     <b>Date Of Submission :</b> {{ j.date_submission }}  <br>
                                     <b>Date of Publication :</b> {{ j.date_publication }}  <br>
-                                    <b>Status:</b> {{ j.status }}  <br>
                                     <b>SCI/SCIE        : </b>{{ j.is_sci }} <br>
                                     <b>Date of Issuance :</b>  {{ j.doi }}
 
                 </td>
 
-                <td id="pub{{ forloop.counter }}D">{{ j.year }}</td>
+                <td id="pub{{ forloop.counter }}D">{{ j.a_month }}/{{ j.year }}</td>
                 <td><a onclick="updatePUB({{ forloop.counter }})" onclick="location.href='#top'"> <i id="bt" class="edit icon" style="font-size:1.3vw;color:blue"></i></a><br><a class="centered raised item" href="{% url 'eis:emp_research_papersDelete' j.id %}"><i id="bt" class="trash outline icon" style="font-size:1.3vw;color:red"></i></a></td>
             </tr>
-
-            {% endfor %}
-
+            {% if forloop.counter0|add:1|divisibleby:10 %}
             </tbody>
-
-            <tfoot>
-            <tr>
-                <th colspan="8">
-                    <div class="ui right floated pagination menu">
-                        <a class="icon item">
-                            <i class="left chevron icon"></i>
-                        </a>
-                        <a class="item">1</a>
-                        <a class="item">2</a>
-                        <a class="item">3</a>
-                        <a class="item">4</a>
-                        <a class="icon item">
-                            <i class="right chevron icon"></i>
-                        </a>
-                    </div>
-                </th>
-            </tr></tfoot>
         </table>
+    </div>
+          {% endif %}
+            {% endfor %}
+     {% if not journal.all.count|divisibleby:10 %}
+     </tbody>
+        </table>
+            </div>
+ {% endif %}
     </div>
 
 
@@ -247,7 +244,7 @@
 
     <div class="ui tab segment" data-tab="conference">
         <h4 class="ui dividing header"  id="changes6">Add a Conference</h4>
-       <form class="ui form"  method="post" action="{% url 'eis:confrence_insert' %}">
+       <form class="ui form"  method="post" action="{% url 'eis:confrence_insert' %}"  onsubmit="return validatec()">
             {% csrf_token %}
            <div style="display: none;"> <input type="text" id="conZ" name="con_id"></div>
             <div class="field">
@@ -263,7 +260,7 @@
             <div class="field">
                 <label>Conference details</label>
                 <div class="fields">
-                    <div class="eight wide field">
+                    <div class="six wide field">
                         <input placeholder="Name of the Conference" type="text" name="name" id="conC" required>
                     </div>
 
@@ -292,6 +289,19 @@
                                 <div class="item" data-value="2002">2002</div>
                                 <div class="item" data-value="2001">2001</div>
                                 <div class="item" data-value="2000">2000</div>
+                            </div>
+                        </div>
+                    </div>
+
+                           <div class="four wide field">
+                              <div class="ui fluid search selection dropdown">
+                            <input type="hidden" name="month"  id="conX"  required>
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Select Month</div>
+                            <div class="menu">
+                               {% for i in "xxxxxxxxxxxx" %}
+                                <div class="item" data-value="{{ forloop.counter }}">{{ forloop.counter }}</div>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
@@ -360,21 +370,6 @@
                                 <label>Page No.</label>
                                 <input placeholder="Date of Publication" type="text"  name="page"  id="conI">
                                </div>
-                             <div class="  field">
-                                <label>Status</label>
-                                <!--<input placeholder="Status" type="text">-->
-                                       <div class="ui fluid search selection dropdown">
-                                    <input type="hidden"  name="status"  id="conJ">
-                                    <i class="dropdown icon"></i>
-                                    <div class="default text">Status</div>
-                                        <div class="menu">
-                                            <div class="item" data-value="Accepted">Accepted</div>
-                                            <div class="item" data-value="Rejected">Rejected</div>
-                                            <div class="item" data-value="Communicated">Communicated</div>
-
-                                        </div>
-                        </div>
-                            </div>
                              <div class=" field">
                                 <label>SCI/SCIE</label>
                                      <div class="ui fluid search selection dropdown">
@@ -402,7 +397,20 @@
         </form>
         <br>
         <h4 class="ui dividing header">Report:</h4>
+        <div class="ui pointing pagination menu">
+                {% for c in conference %}
+                {% if forloop.counter0|divisibleby:10 %}
+                    <span align="right>"><a class="{% if forloop.counter0 == 0 %}active {% endif %}item" data-tab="c-{{ forloop.counter0 }}">
+                        {% widthratio forloop.counter|add:10 10 1 %}
+     </a></span>
+                {% endif %}
+                {% endfor %}
 
+            </div>
+     {% for c in conference %}
+
+            {% if forloop.counter0|divisibleby:10 %}
+            <div class="ui {% if forloop.counter0 == 0 %}active {% endif %} tab segment" data-tab="c-{{ forloop.counter0 }}">
         <table class="ui fixed sortable celled table">
             <thead>
             <tr>
@@ -424,7 +432,7 @@
             </thead>
 
             <tbody>
-            {% for c in conference %}
+            {% endif %}
             <tr>
                 <td id="con{{ forloop.counter }}Z"><div style="display: none;">{{ c.id }}</div>{{ forloop.counter }}.</td>
                 <td id="con{{ forloop.counter }}A">{{ c.authors }}</td>
@@ -436,37 +444,26 @@
                     <b>Date of Submission :</b>  {{ c.date_submission }}<br>
                     <b>Start Date :</b>  {{ c.date_acceptance }} <br>
                     <b>End Date : </b> {{ c.date_publication }} <br>
-                    <b>Status :</b>{{ c.status }} <br>
                     <b>Conference Date(s)   : </b> {{ c.start_date }} to {{ c.end_date }}<br>
                     <b>ISBN No.     :   </b> {{ c.issn_no }}
 
                 </td>
 
-                <td id="con{{ forloop.counter }}D">{{ c.year }}</td>
+                <td id="con{{ forloop.counter }}D">{{ c.a_month }}/{{ c.year }}</td>
                 <td><a onclick="updateCON({{ forloop.counter }})"><i id="bt" class="edit icon" style="font-size:1.3vw;color:blue;"></i></a><br><a class="centered raised item" href="{% url 'eis:emp_research_papersDelete' c.id %}"><i id="bt" class="trash outline icon" style="font-size:1.3vw;color:red;"></i><br>
                 </a> </td>
             </tr>
-            {% endfor %}
+            {% if forloop.counter0|add:1|divisibleby:10 %}
             </tbody>
-
-            <tfoot>
-            <tr>
-                <th colspan="7">
-                    <div class="ui right floated pagination menu">
-                        <a class="icon item">
-                            <i class="left chevron icon"></i>
-                        </a>
-                        <a class="item">1</a>
-                        <a class="item">2</a>
-                        <a class="item">3</a>
-                        <a class="item">4</a>
-                        <a class="icon item">
-                            <i class="right chevron icon"></i>
-                        </a>
-                    </div>
-                </th>
-            </tr></tfoot>
         </table>
+    </div>
+          {% endif %}
+            {% endfor %}
+     {% if not conference.all.count|divisibleby:10 %}
+     </tbody>
+        </table>
+            </div>
+ {% endif %}
     </div>
     {% comment %}The Conference segment ends here!{% endcomment %}
 
@@ -474,7 +471,7 @@
     {% comment %}The Books segment starts here!{% endcomment %}
     <div class="ui tab segment" data-tab="books">
         <h4 class="ui dividing header" id="changes7">Add a Book/Book Chapter</h4>
-        <form class="ui form"  method="post" action="{% url 'eis:book_insert' %}">
+        <form class="ui form"  method="post" action="{% url 'eis:book_insert' %}"  onsubmit="return validatebooks()">
             {% csrf_token %}
             <div style="display: none;"> <input type="text" id="booksZ" name="book_id"></div>
             <div class="field">
@@ -505,7 +502,7 @@
             <div class="field">
                 <label>Publisher</label>
                 <div class="fields">
-                    <div class="twelve wide field">
+                    <div class="eight wide field">
                         <input placeholder="Publisher" type="text" name="publisher" id="booksC" required>
                     </div>
 
@@ -523,6 +520,18 @@
                                 <div class="item" data-value="2015">2015</div>
                                 <div class="item" data-value="2016">2016</div>
                                 <div class="item" data-value="2017">2017</div>
+                            </div>
+                        </div>
+                    </div>
+                          <div class="four wide field">
+                              <div class="ui fluid search selection dropdown">
+                            <input type="hidden" name="month"  id="booksX"  required>
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Select Month</div>
+                            <div class="menu">
+                               {% for i in "xxxxxxxxxxxx" %}
+                                <div class="item" data-value="{{ forloop.counter }}">{{ forloop.counter }}</div>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
@@ -548,6 +557,20 @@
         </form>
         <br>
         <h4 class="ui dividing header">Report:</h4>
+        <div class="ui pointing pagination menu">
+                {% for b in books %}
+                {% if forloop.counter0|divisibleby:10 %}
+                    <span align="right>"><a class="{% if forloop.counter0 == 0 %}active {% endif %}item" data-tab="b-{{ forloop.counter0 }}">
+                        {% widthratio forloop.counter|add:10 10 1 %}
+     </a></span>
+                {% endif %}
+                {% endfor %}
+
+            </div>
+     {% for b in books %}
+
+            {% if forloop.counter0|divisibleby:10 %}
+            <div class="ui {% if forloop.counter0 == 0 %}active {% endif %} tab segment" data-tab="b-{{ forloop.counter0 }}">
         <table class="ui fixed sortable celled table">
             <thead>
             <tr>
@@ -572,37 +595,27 @@
             </thead>
 
             <tbody>
-            {% for b in books %}
+            {% endif %}
             <tr>
                 <td id="books{{ forloop.counter }}Z"><div style="display: none;">{{ b.id }}</div>{{ forloop.counter }}.</td>
                 <td id="books{{ forloop.counter }}A">{{ b.p_type }}</td>
                 <td id="books{{ forloop.counter }}B">{{ b.title }}</td>
                 <td id="books{{ forloop.counter }}C">{{ b.publisher }}</td>
-                <td id="books{{ forloop.counter }}D">{{ b.pyear }}</td>
+                <td id="books{{ forloop.counter }}D">{{ b.a_month }}/{{ b.pyear }}</td>
                 <td id="books{{ forloop.counter }}E">{{ b.co_authors }}</td>
                 <td><a onclick="updateBOOKS({{ forloop.counter }})"><i id="bt" class="edit icon" style="font-size:1.3vw;color:blue"></i></a><br><a class="centered raised item" href="{% url 'eis:emp_published_booksDelete' b.id %}"><i id="bt" class="trash outline icon" style="font-size:1.3vw;color:red;"></i></a></td>
             </tr>
-            {% endfor %}
+            {% if forloop.counter0|add:1|divisibleby:10 %}
             </tbody>
-            <tfoot>
-            <tr>
-                <th colspan="7">
-                    <div class="ui right floated pagination menu">
-                        <a class="icon item">
-                            <i class="left chevron icon"></i>
-                        </a>
-                        <a class="item">1</a>
-                        <a class="item">2</a>
-                        <a class="item">3</a>
-                        <a class="item">4</a>
-                        <a class="icon item">
-                            <i class="right chevron icon"></i>
-                        </a>
-                    </div>
-                </th>
-            </tr></tfoot>
         </table>
     </div>
-<a class="" onclick="location.href='#top'">top</a>
+          {% endif %}
+            {% endfor %}
+     {% if not conference.all.count|divisibleby:10 %}
+     </tbody>
+        </table>
+            </div>
+ {% endif %}
+    </div>
     {% comment %}The Books segment ends here!{% endcomment %}
 {% endblock %}

@@ -118,6 +118,7 @@ class ApplyLeave(View):
                     leave_address = form.cleaned_data.get('leave_address', ''),
                     start_date = form.cleaned_data['start_date'],
                     end_date = form.cleaned_data['end_date'],
+                    station = form.cleaned_data.get('station_leave'),
                 )
 
             except Exception as e:

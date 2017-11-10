@@ -8,7 +8,11 @@
 
             {% comment %}The User Item starts here!{% endcomment %}
             <div class="ui inverted centered raised item">
-                <img src="{% static 'fusion/img/zlatan.jpg' %}" class="ui small circular centered image">
+		{% if request.user.extrainfo.profile_picture %}
+                	<img src="{{ request.user.extrainfo.profile_picture.url }}" class="ui small circular centered image">
+            	{% else %}
+                	<img src="{% static 'fusion/img/zlatan.jpg' %}" class="ui small circular centered image">
+            	{% endif %}
 
                 <br>
 

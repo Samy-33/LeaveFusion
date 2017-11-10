@@ -480,13 +480,17 @@ function getData(_row){
     document.getElementById("changes3").innerHTML = "<span style='color:red;'>Edit the selected thesis details</span>";
     for(var i=0;i<cols.length;i++)  {
         var _temp=document.getElementById("s"+_row+cols[i]).innerHTML;
-        if (_temp.search("<b>Name: </b>")==0){
-            var pos = _temp.search("<br>");
-            document.getElementById("f"+cols[i]).value=_temp.slice(13, pos);
+        if (i==0){
+            var pos = _temp.indexOf("<br>");
+            document.getElementById("fA").value=_temp.slice(13, pos);
             pos = _temp.lastIndexOf("</b>");
             document.getElementById("fE").value=_temp.slice(pos+4, _temp.length);
+        }else if(i==2){
+            document.getElementById("fX").value=_temp.slice(0,_temp.search("/"));
+            document.getElementById("f"+cols[i]).value=_temp.slice(_temp.search("/")+1,_temp.length);
         }
         else{
+
             document.getElementById("f"+cols[i]).value=_temp;
         }
     }
@@ -506,6 +510,9 @@ function updatePHD(_row){
             document.getElementById("phd"+cols[i]).value=_temp.slice(13, pos);
             pos = _temp.lastIndexOf("</b>");
             document.getElementById("phdE").value=_temp.slice(pos+4, _temp.length);
+        }else if(i==2){
+            document.getElementById("phdX").value=_temp.slice(0,_temp.search("/"));
+            document.getElementById("phd"+cols[i]).value=_temp.slice(_temp.search("/")+1,_temp.length);
         }
         else{
             document.getElementById("phd"+cols[i]).value=_temp;
@@ -564,6 +571,10 @@ function updateCONF(_row){
     document.getElementById("changes17").innerHTML = "<span style='color:red;'>Edit the selected conference organized details</span>";
     for(var i=0;i<cols.length;i++)  {
         var _temp=document.getElementById("conf"+_row+cols[i]).innerHTML;
+        document.getElementById("confY").value=document.getElementById("conf"+_row+"Y").innerHTML;
+        if(document.getElementById("conf"+_row+"Y").innerHTML.search("<br>")>0){
+            document.getElementById("confY").value=document.getElementById("conf"+_row+"Y").innerHTML;
+        }
         if(i==2){
             var pos = _temp.search(" - ");
             document.getElementById("conf"+cols[i]).value=_temp.slice(0, pos);
@@ -692,9 +703,11 @@ function updatePUB(_row){
             document.getElementById("pubG").value = _temp.slice(_temp.indexOf("Reference ")+20,_temp.indexOf("<br>",_temp.indexOf("Reference "))).trim();
             document.getElementById("pubH").value = _temp.slice(_temp.indexOf("Submission ")+17,_temp.indexOf("<br>",_temp.indexOf("Submission "))).trim();
             document.getElementById("pubI").value = _temp.slice(_temp.indexOf("Publication")+18,_temp.indexOf("<br>",_temp.indexOf("Publication"))).trim();
-            document.getElementById("pubJ").value = _temp.slice(_temp.indexOf("Status")+12,_temp.indexOf("<br>",_temp.indexOf("Status"))).trim();
             document.getElementById("pubK").value = _temp.slice(_temp.indexOf("SCIE ")+18,_temp.indexOf("<br>",_temp.indexOf("SCIE "))).trim();
             document.getElementById("pubL").value = _temp.slice(_temp.indexOf("Issuance")+16,_temp.indexOf("<br>",_temp.indexOf("Issuance"))).trim();
+        }else if (i == 3){
+        document.getElementById("pubX").value=_temp.slice(0,_temp.search("/"));
+        document.getElementById("pub"+cols[i]).value=_temp.slice(_temp.search("/")+1,_temp.length);
         }
         else{
             document.getElementById("pub"+cols[i]).value=_temp;
@@ -720,8 +733,12 @@ function updateCON(_row){
             document.getElementById("conG").value = _temp.slice(_temp.indexOf("Start")+18,_temp.indexOf("<br>",_temp.indexOf("Start"))).trim();
             document.getElementById("conH").value = _temp.slice(_temp.indexOf("End")+16,_temp.indexOf("<br>",_temp.indexOf("End"))).trim();
             document.getElementById("conI").value = _temp.slice(_temp.indexOf("Page ")+18,_temp.indexOf("<br>",_temp.indexOf("Page "))).trim();
-            document.getElementById("conJ").value = _temp.slice(_temp.indexOf("Status")+12,_temp.indexOf("<br>",_temp.indexOf("Status"))).trim();
             document.getElementById("conL").value = _temp.slice(_temp.indexOf("ISBN ")+21,_temp.indexOf("<br>",_temp.indexOf("ISBN "))).trim();
+        }else if(i==3){
+        {
+            document.getElementById("conX").value=_temp.slice(0,_temp.search("/"));
+            document.getElementById("con"+cols[i]).value=_temp.slice(_temp.search("/")+1,_temp.length);
+        }
         }
         else{
             document.getElementById("con"+cols[i]).value=_temp;
@@ -738,7 +755,13 @@ function updateBOOKS(_row){
     document.getElementById("changes7").innerHTML = "<span style='color:red;'>Edit the selected published book details</span>";
     for(var i=0;i<cols.length;i++)  {
         var _temp=document.getElementById("books"+_row+cols[i]).innerHTML;
+        if(i==3){
+            document.getElementById("booksX").value=_temp.slice(0,_temp.search("/"));
+            document.getElementById("books"+cols[i]).value=_temp.slice(_temp.search("/")+1,_temp.length);
+        }
+        else{
         document.getElementById("books"+cols[i]).value=_temp;
+        }
     }
 }
 
@@ -790,7 +813,13 @@ function updatePATENT(_row){
     document.getElementById("changes10").innerHTML = "<span style='color:red;'>Edit the selected patent details</span>";
     for(var i=0;i<cols.length;i++)  {
         var _temp=document.getElementById("patent"+_row+cols[i]).innerHTML;
-        document.getElementById("patent"+cols[i]).value=_temp;
+        if(i==3){
+            document.getElementById("patentX").value=_temp.slice(0,_temp.search("/"));
+            document.getElementById("patent"+cols[i]).value=_temp.slice(_temp.search("/")+1,_temp.length);
+        }
+        else{
+            document.getElementById("patent"+cols[i]).value=_temp;
+        }
     }
 }
 
@@ -807,6 +836,120 @@ function updateTECH(_row){
     }
 }
 
+function validateaward() {
+if(document.getElementById("achA").value=="")
+    {
+    alert("Please enter Achievement Type");
+    return false;
+    }
+    else if(document.getElementById("achF").value=="")
+    {
+    alert("Please enter Month");
+    return false;
+    }
+    else if(document.getElementById("achE").value=="")
+    {
+    alert("Please enter Year");
+    return false;
+    }
+}
+function validateevent() {
+if(document.getElementById("eventA").value=="")
+    {
+    alert("Please enter Role");
+    return false;
+    }
+    else if(document.getElementById("eventG").value=="")
+    {
+    alert("Please enter Event Type");
+    return false;
+    }
+}
+function validateexp() {
+if(document.getElementById("lecA").value=="")
+    {
+    alert("Please enter Expert Lecture or Invited Talk");
+    return false;
+    }
+}
+function validatepg() {
+if(document.getElementById("fC").value=="")
+    {
+    alert("Please enter Year");
+    return false;
+    }
+    else if(document.getElementById("fX").value=="")
+    {
+    alert("Please enter Month");
+    return false;
+    }
+}function validatephd() {
+if(document.getElementById("phdC").value=="")
+    {
+    alert("Please enter Year");
+    return false;
+    }
+    else if(document.getElementById("phdX").value=="")
+    {
+    alert("Please enter Month");
+    return false;
+    }
+}
+function validatepatent() {
+if(document.getElementById("patentX").value=="")
+    {
+    alert("Please enter Month");
+    return false;
+    }
+    else if(document.getElementById("patentD").value=="")
+    {
+    alert("Please enter Year");
+    return false;
+    }
+}
+
+function validatebooks() {
+if(document.getElementById("booksX").value=="")
+    {
+    alert("Please enter Month");
+    return false;
+    }
+    else if(document.getElementById("booksD").value=="")
+    {
+    alert("Please enter Year");
+    return false;
+    }else if(document.getElementById("booksA").value=="")
+    {
+    alert("Please enter Type");
+    return false;
+    }
+}
+
+function validatejournal() {
+if(document.getElementById("pubX").value=="")
+    {
+    alert("Please enter Month");
+    return false;
+    }
+    else if(document.getElementById("pubD").value=="")
+    {
+    alert("Please enter Year");
+    return false;
+    }
+}
+
+function validatec() {
+if(document.getElementById("conX").value=="")
+    {
+    alert("Please enter Month");
+    return false;
+    }
+    else if(document.getElementById("conD").value=="")
+    {
+    alert("Please enter Year");
+    return false;
+    }
+}
 
 function editSave() {
     editSave1();
