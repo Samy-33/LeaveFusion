@@ -23,6 +23,8 @@
             <th>To</th>
             <th>Leave Type</th>
             <th>Station Leave</th>
+            <th>Details</th>
+
         </tr>
         </thead>
 
@@ -51,6 +53,7 @@
                     <td>{{ req.leave_request.leave.type_of_leave }}</td>
                     <td>{% if req.leave_request.leave.station %} Yes {% else %} No {% endif %}</td>
                     <input type="hidden" id="inp-application-{{req.leave_request.id}}" data="{{ req.leave_request.leave.purpose }}"/>
+                    <td><button class='ui button green' onclick='lol({{req.leave_request.leave.id}})'> Details </button></td>
                 </tr>
             {% endfor %}
         {% else %}
@@ -96,6 +99,7 @@
             <th>To</th>
             <th>Leave Type</th>
             <th>Station Leave</th>
+            <th>Details</th>
         </tr>
         </thead>
 
@@ -119,6 +123,7 @@
                     <td>{{ req.leave.type_of_leave }}</td>
                     <td>{% if req.leave.station %} Yes {% else %} No {% endif %}</td>
                     <input type="hidden" id="inp-application-{{req.leave_request.id}}" data="{{ req.leave_request.leave.purpose }}"/>
+                    <td><button class='ui button green' onclick='lol({{req.leave.id}})'> Details </button></td>
                 </tr>
             {% endfor %}
         {% else %}

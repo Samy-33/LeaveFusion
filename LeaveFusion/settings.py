@@ -25,7 +25,7 @@ SECRET_KEY = 'v0o)kux-3d_nigwc=bnq!josh)0ctcgxvjoao^jbquc8nulbg2'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['fusion.iiitdmj.ac.in']
+ALLOWED_HOSTS = []
 
 #Google authentication
 SOCIALACCOUNT_PROVIDERS = {

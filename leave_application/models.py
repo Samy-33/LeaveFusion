@@ -16,7 +16,8 @@ class Constants:
     )
 
 class LeavesCount(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    year = models.IntegerField(default=2017)
     casual = models.IntegerField(default=8)
     special_casual = models.IntegerField(default=15)
     restricted = models.IntegerField(default=2)
@@ -52,6 +53,9 @@ class Leave(models.Model):
     admin_done = models.BooleanField(default=True)
     start_date = models.DateField()
     end_date = models.DateField()
+    station_start_date = models.DateField(null=True)
+    station_end_date = models.DateField(null=True)
+    remark = models.CharField(max_length=200, blank=True, default='')
     purpose = models.CharField(max_length=1000, blank=False, default='No Purpose')
     leave_address = models.CharField(max_length=100, blank=True, default='')
     status = models.CharField(max_length=10, blank=False, default='processing')
@@ -178,5 +182,7 @@ class LeaveMigration(models.Model):
                                                                         self.replacer.username,
                                                                         self.start_date)
 
+
 class MigrationChangeDate(models.Model):
     last_date_change = models.DateField()
+    last_commute_year = models.IntegerField(default=2017)

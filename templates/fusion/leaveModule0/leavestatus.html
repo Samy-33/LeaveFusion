@@ -36,6 +36,9 @@
                     <th>
                         Status
                     </th>
+                    <th>
+                        Details
+                    </td>
                 </tr>
                 </thead>
 
@@ -82,6 +85,7 @@
                             <i class="large {% if leave.status == 'accepted' %}green checkmark
                             {% elif leave.status == 'processing' %} orange warning {% else %} red x {% endif %} icon"></i>
                         </td>
+                        <td> <button class='ui button green' id='expand' onclick='lol({{leave.pk}})'> Details </button></td>
                     </tr>
 
                 {% endfor %}

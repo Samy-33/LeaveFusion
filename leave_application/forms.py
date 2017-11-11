@@ -51,10 +51,10 @@ class LeaveForm(forms.Form):
 
         today = datetime.date.today()
 
-        if start_date > end_date or start_date < today or end_date < today \
-           or [start_date.year, end_date.year] != [today.year, today.year]:
+        if start_date > end_date or start_date < today or end_date < today:
+           # or [start_date.year, end_date.year] != [today.year, today.year]:
 
-           raise forms.ValidationError({'start_date': ['Past Dates or next year dates not allowed',]})
+           raise forms.ValidationError({'start_date': ['Past Dates not allowed',]})
 
         type_of_leave = self.cleaned_data.get('type_of_leave')
         if type_of_leave == 'restricted':

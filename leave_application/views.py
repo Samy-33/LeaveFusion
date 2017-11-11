@@ -10,31 +10,35 @@ from leave_application.models import (Leave, CurrentLeaveRequest,
                                       LeaveRequest, LeavesCount,
                                       LeaveMigration,)
 from django.contrib.auth.models import User
-from leave_application.helpers import FormData, get_object_or_none
+from leave_application.helpers import FormData, get_object_or_none, count_work_days
 from django.db.models import Q
 from django.db import transaction
+import datetime
+import json
 
 class LeaveView(View):
 
     def get(self, request):
         cake = request.GET.get('cake')
-
+        curr_year = datetime.date.today().year
         if not cake:
-            leaves_count = LeavesCount.objects.get(user=request.user)
+            leaves_count = LeavesCount.objects.get(user=request.user, year=curr_year)
             applications = GetApplications.get_reps(request)
             message = request.GET.get('message', None)
             form = ApplyLeave.get_form(request) if not message else None
+            received_requests = GetApplications.get_count(request)
             context = {
                 'form': form,
                 'leaves_count': leaves_count,
                 'message': message,
+                'show_approve': received_requests
             }
             context.update(applications)
             return render(request, 'fusion/leaveModule0/leave.html', context)
 
         elif cake == 'form':
             form = ApplyLeave.get_form(request)
-            leaves_count = LeavesCount.objects.get(user=request.user)
+            leaves_count = LeavesCount.objects.get(user=request.user, year=curr_year)
             context = {
                 'form': form,
                 'leaves_count': leaves_count,
@@ -54,8 +58,19 @@ class LeaveView(View):
             context = GetApplications.get_to_approve(request)
             return render(request, 'fusion/leaveModule0/leaveapprove.html', context)
 
+        elif cake == 'detail':
+            pk = request.GET.get('pk')
+            leave = Leave.objects.get(pk=pk)
+            detail_list = list({'name' : '{} {}'.format(reqs.requested_from.first_name, reqs.requested_from.last_name), 'status': reqs.status, 'type': reqs.position.name} for reqs in leave.requests.all())
+
+            detail_list += list({'name' : '{} {}'.format(reqs.requested_from.first_name, reqs.requested_from.last_name), 'status': 'pending', 'type': reqs.position.name} for reqs in leave.cur_requests.all())
+
+            # print(detail_list)
+            # CurrentLeaveRequest.objects.filter(leave=)
+            return JsonResponse(detail_list, safe=False)
+
         else:
-            return HttpResponse('Are you a dick?')
+            return HttpResponse('You can\'t see this page.')
 
 class ApplyLeave(View):
     """
@@ -285,6 +300,8 @@ class ProcessRequest(View):
 
         return response
 
+
+
     @transaction.atomic
     def create_leave_request(self, cur_leave_request, final, accept=False, remark=''):
         leave_request = LeaveRequest.objects.create(
@@ -299,24 +316,72 @@ class ProcessRequest(View):
         if not accept and final:
             cur_leave_request.leave.status = 'rejected'
         elif final:
+            curr_year = datetime.date.today().year
+            start_date = cur_leave_request.leave.start_date
+            end_date = cur_leave_request.leave.end_date
+            if curr_year == start_date.year and curr_year == end_date.year:
+                count = LeavesCount.objects.get(user=cur_leave_request.applicant, year=curr_year)
 
-            count = LeavesCount.objects.get(user=cur_leave_request.applicant)
+                remain = getattr(count, cur_leave_request.leave.type_of_leave)
+                required_leaves = cur_leave_request.leave.count_work_days
+                # print(required_leaves, remain)
+                # return True
+                if remain < required_leaves:
+                    cur_leave_request.leave.status = 'rejected'
+                else:
+                    setattr(count, cur_leave_request.leave.type_of_leave,
+                                   remain - required_leaves)
+                    count.save()
+                    self.create_migration(cur_leave_request.leave)
+                    cur_leave_request.leave.status = 'accepted'
+            elif curr_year == start_date.year and end_date.year == curr_year + 1:
+                final_date = datetime.date(curr_year, 12, 31)
 
-            remain = getattr(count, cur_leave_request.leave.type_of_leave)
-            required_leaves = cur_leave_request.leave.count_work_days
-            # print(required_leaves, remain)
-            # return True
-            if remain < required_leaves:
-                cur_leave_request.leave.status = 'rejected'
-            else:
-                setattr(count, cur_leave_request.leave.type_of_leave,
-                               remain - required_leaves)
-                count.save()
-                self.create_migration(cur_leave_request.leave)
-                cur_leave_request.leave.status = 'accepted'
+                days_in_curr_year = count_work_days(start_date, final_date)
+                final_date += datetime.timedelta(days=1)
+                days_in_next_year = count_work_days(final_date, end_date)
+                curr_count = LeavesCount.objects.get(user=cur_leave_request.applicant,
+                                                     year=start_date.year)
+                next_count = LeavesCount.objects.get(user=cur_leave_request.applicant,
+                                                     year=end_date.year)
+
+                curr_remaining = getattr(curr_count, cur_leave_request.leave.type_of_leave)
+                next_remaining = getattr(next_count, cur_leave_request.leave.type_of_leave)
+
+                if curr_remaining >= days_in_curr_year and next_remaining >= days_in_next_year:
+                    setattr(curr_count, cur_leave_request.leave.type_of_leave,
+                            curr_remaining - days_in_curr_year)
+                    curr_count.save()
+                    setattr(next_count, cur_leave_request.leave.type_of_leave,
+                            next_remaining - days_in_next_year)
+                    next_count.save()
+                    self.create_migration(cur_leave_request.leave)
+                    cur_leave_request.leave.status = 'accepted'
+                else:
+                    cur_leave_request.leave.status = 'rejected'
+
+            elif start_date.year + 1 == crr_year and end_date.year + 1 == curr_year:
+                count = LeavesCount.objects.get(user=cur_leave_request.applicant, year=curr_year+1)
+
+                remain = getattr(count, cur_leave_request.leave.type_of_leave)
+                required_leaves = cur_leave_request.leave.count_work_days
+                # print(required_leaves, remain)
+                # return True
+                if remain < required_leaves:
+                    cur_leave_request.leave.status = 'rejected'
+                else:
+                    setattr(count, cur_leave_request.leave.type_of_leave,
+                                   remain - required_leaves)
+                    count.save()
+                    self.create_migration(cur_leave_request.leave)
+                    cur_leave_request.leave.status = 'accepted'
+
+
         cur_leave_request.leave.save()
         cur_leave_request.delete()
         return leave_request
+
+
 
     def process_student_request(self, sanc_auth, leave_request, remark, process):
 
@@ -408,14 +473,19 @@ class GetApplications():
     def get_to_approve(cls, request):
         processed_request_list = LeaveRequest.objects.filter(requested_from=request.user).order_by('-id')
 
-        replacement = Replacement.objects.filter(Q(replacer=request.user)
+        replacements = Replacement.objects.filter(Q(replacer=request.user)
                                                  & Q(replacement_type='administrative'))
-        replacee = replacement.first().replacee if replacement else None
-        request_list = CurrentLeaveRequest.objects.filter((Q(requested_from=request.user)
-                                                          | Q(requested_from=replacee))
+        reqs = CurrentLeaveRequest.objects.filter(Q(requested_from=request.user)
                                                           & ~(Q(permission='academic')
                                                           | Q(permission='admin')))
-        request_list = [cls.should_forward(request, q_obj) for q_obj in request_list]
+        request_list = [cls.should_forward(request, q_obj) for q_obj in reqs]
+        for replacement in replacements:
+            replacee = replacement.replacee
+            reqs = CurrentLeaveRequest.objects.filter((Q(requested_from=request.user)
+                                                              | Q(requested_from=replacee))
+                                                              & ~(Q(permission='academic')
+                                                              | Q(permission='admin')))
+            request_list += [cls.should_forward(request, q_obj) for q_obj in reqs]
 
         # print(rep_requests)
         context = {
@@ -430,6 +500,33 @@ class GetApplications():
         #                                                               'action':'ViewRequests',
         #                                                               'count':count,
         #                                                               'prequests':prequest_list})
+
+    @classmethod
+    def get_count(cls, request):
+        processed_request_list_exists = LeaveRequest.objects.filter(requested_from=request.user).exists()
+
+        if processed_request_list_exists:
+            return True
+
+        replacements = Replacement.objects.filter(Q(replacer=request.user)
+                                                 & Q(replacement_type='administrative'))
+        reqs = CurrentLeaveRequest.objects.filter(Q(requested_from=request.user)
+                                                  & ~(Q(permission='academic')
+                                                    | Q(permission='admin'))).exists()
+        if reqs:
+            return reqs
+        #reqeust_list = []
+        for replacement in replacements:
+            replacee = replacement.replacee
+            reqs = CurrentLeaveRequest.objects.filter((Q(requested_from=request.user)
+                                                              | Q(requested_from=replacee))
+                                                              & ~(Q(permission='academic')
+                                                              | Q(permission='admin'))).exists()
+            # print(reqs)
+            if reqs:
+                return True
+
+        return False
 
     @classmethod
     def get_reps(cls, request):

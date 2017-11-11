@@ -53,11 +53,12 @@
                         Leave Balance (Inactive)
                         <i class="right floated chevron right icon"></i>
                     </a> -->
-
-                    <a class="item" id="leave_approve" data-tab="third">
-                        Approve
-                        <i class="right floated chevron right icon"></i>
-                    </a>
+                    {% if show_approve %}
+                        <a class="item" id="leave_approve" data-tab="third">
+                            Approve
+                            <i class="right floated chevron right icon"></i>
+                        </a>
+                    {% endif %}
                 </div>
                 {% comment %}The Tab-Menu ends here!{% endcomment %}
 
@@ -101,6 +102,39 @@
                         </div>
                     </div>
                 </div>
+
+
+
+
+
+
+                <div class="ui basic modal" id="detail-modal">
+                    <div class="ui icon header">
+                        <i class="read icon"></i>
+                    </div>
+                    <div class="content">
+
+                    </div>
+                    <div class="actions">
+                        <div class="ui red basic cancel inverted button" id="modal-reject">
+                            <i class="remove icon"></i>
+                            Close
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="ui basic modal" id="load-modal">
+                    <div class="content">
+                        <center>
+                                <div class="ui huge loader">
+                        </center>
+                    </div>
+                </div>
+
+
 
                 <div class="ui basic modal" id="response-modal">
                     <div class="ui icon header">
@@ -317,6 +351,12 @@
         $('#leave_application').on('click', function(e){
             // $('#main_active').html('Loading');
             e.preventDefault();
+            // $('#main_active').html('<div class="ui segment"><p></p><div class="ui active dimmer"> \
+            //                         <div class="ui loader"></div> \
+            //                         </div></div>');
+
+            $('#load-modal').modal('show');
+
             $.ajax({
                 type: 'get',
                 url: '/leave/?cake=form',
@@ -327,6 +367,7 @@
                     $('#leave_application').addClass('active');
                     $('#leave_status').removeClass('active');
                     $('#leave_approve').removeClass('active');
+                    $('#load-modal').modal('hide');
                 },
                 error: function(err){
                 alert(err);
@@ -337,6 +378,10 @@
         $('#leave_status').on('click', function(e){
             // $('#main_active').html('Loading');
             e.preventDefault();
+            // $('#main_active').html('<div class="ui segment"><p></p><div class="ui active dimmer"> \
+            //                         <div class="ui loader"></div> \
+            //                         </div></div>');
+            $('#load-modal').modal('show');
             $.ajax({
                 type: 'get',
                 url: '/leave/?cake=status',
@@ -347,6 +392,7 @@
                     $('#leave_status').addClass('active');
                     $('#leave_application').removeClass('active');
                     $('#leave_approve').removeClass('active');
+                    $('#load-modal').modal('hide');
                 },
                 error: function(err){
                     alert(err);
@@ -357,6 +403,10 @@
         $('#leave_approve').on('click', function(e){
             // $('#main_active').html('Loading');
             e.preventDefault();
+            // $('#main_active').html('<div class="ui segment"><p></p><div class="ui active dimmer"> \
+            //                         <div class="ui loader"></div> \
+            //                         </div></div>');
+            $('#load-modal').modal('show');
             $.ajax({
                 type: 'get',
                 url: '/leave/?cake=approve',
@@ -367,13 +417,53 @@
                     $('#leave_application').removeClass('active');
                     $('#leave_status').removeClass('active');
                     $('#leave_approve').addClass('active');
+                    $('#load-modal').modal('hide');
                 },
                 error: function(err){
                     alert(err);
                 }
             });
         });
+        function lol(primary_key) {
+            var modal = $('#detail-modal');
+            $.ajax({
+                type: 'get',
+                url: '/leave',
+                data: {
+                    cake: 'detail',
+                    pk: primary_key
+                },
+                success: function(data){
 
+                    html = '<table class="ui selectable inverted table"> <thead>\
+                        <tr> \
+                          <th>Name</th>\
+                          <th>Designation</th>\
+                          <th class="right aligned">Status</th>\
+                        </tr>\
+                      </thead>\
+                      <tbody>';
+                    for( var i=0; i < data.length; i++){
+                        var req = data[i];
+                        html += '<tr><td>' + req.name + '</td><td>' + req.type + '<td class="right aligned">';
+                        if( req.status == 'pending'){
+                            html += '<span class="orange">PENDING</span></td>';
+                        }
+                        else if(req.status == true){
+                            html += '<span class="green">ACCEPTED</span></td>';
+                        }
+                        else html += '<span class="red">REJECTED</span></td>';
+                    }
+                    html += '</tr> </tbody> </table>';
+                    modal.find('.content').html(html);
+                    modal.modal('show');
+                },
+                error: function(data, err){
+                    console.log(err);
+                    html = '';
+                }
+            });
+        }
 
     </script>
 {% endblock %}
