@@ -129,8 +129,8 @@
                                 </div>
                             </div>
 
-                            
-                      
+
+
                             <div class=" four fields">
                                <div class="field">
                                 <label>Date of Publication(DOP)</label>
@@ -163,11 +163,11 @@
                                               <i class="calendar icon"></i>
                                               <input type="text" placeholder="DOI"  name="doi" id="pubL">
                                             </div>
-                                          </div>   
+                                          </div>
                                   </div>
                              </div>
 
-                             
+
                                     </div>
                                  </div>
                             </div>
@@ -195,7 +195,7 @@
         <table class="ui fixed sortable celled table">
             <thead>
             <tr>
-                
+
                 <th class="sorted ascending" style="width: 7%;">Sr.</th>
                 <th class="" style="width: 20%;" >Authors</th>
                 <th class="" style="width: 20%;">Title of Paper</th>
@@ -393,7 +393,7 @@
                             </div>
                       </div>
 
-                     
+
                     </div>
                 </div>
 
@@ -615,11 +615,12 @@
     </div>
           {% endif %}
             {% endfor %}
-     {% if not conference.all.count|divisibleby:10 %}
+     {% if not books.all.count|divisibleby:10 %}
      </tbody>
         </table>
             </div>
  {% endif %}
     </div>
     {% comment %}The Books segment ends here!{% endcomment %}
+
 {% endblock %}
