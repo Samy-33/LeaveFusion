@@ -135,6 +135,7 @@
                 {% if forloop.counter0|divisibleby:10 %}
                     <span align="right>"><a class="{% if forloop.counter0 == 0 %}active {% endif %}item" data-tab="consymp-{{ forloop.counter0 }}">
                         {% widthratio forloop.counter|add:10 10 1 %}
+
      </a></span>
                 {% endif %}
                 {% endfor %}

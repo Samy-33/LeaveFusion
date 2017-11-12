@@ -47,7 +47,7 @@ class LeaveView(View):
 
         elif cake == 'status':
             user_leaves = Leave.objects.filter(applicant=request.user)
-            # print(user_leaves)
+
             context = {
                 'user_leaves': user_leaves
             }
@@ -61,13 +61,8 @@ class LeaveView(View):
         elif cake == 'detail':
             pk = request.GET.get('pk')
             leave = Leave.objects.get(pk=pk)
-            detail_list = list({'name' : '{} {}'.format(reqs.requested_from.first_name, reqs.requested_from.last_name), 'status': reqs.status, 'type': reqs.position.name} for reqs in leave.requests.all())
 
-            detail_list += list({'name' : '{} {}'.format(reqs.requested_from.first_name, reqs.requested_from.last_name), 'status': 'pending', 'type': reqs.position.name} for reqs in leave.cur_requests.all())
-
-            # print(detail_list)
-            # CurrentLeaveRequest.objects.filter(leave=)
-            return JsonResponse(detail_list, safe=False)
+            return render(request, 'fusion/leaveModule0/details.html', {'leave': leave})
 
         else:
             return HttpResponse('You can\'t see this page.')
@@ -81,32 +76,7 @@ class ApplyLeave(View):
             view to handle get request to /leave/apply
         """
         # TODO: Check if leave not rejected or accepted and leave instance belongs to user
-        # TODO: Take another value as action so that action can specify edit or delete with same constraint
-
-        # id = request.GET.get('id')
-        # if id:
-        #     leave = get_object_or_404(Leave, id=id)
-        #     user_type = self.get_user_type(request)
-        #     if user_type == 'faculty':
-        #         form = FacultyLeaveForm(leave, user=request.user)
-        #     elif user_type == 'staff':
-        #         form = StaffLeaveForm(leave, user=request.user)
-        #     else:
-        #         form = StudentLeaveForm(leave)
-        #     return render(request, 'leave_application/apply_for_leave.html', {'form': form, 'title': 'Leave', 'action':'Edit'})
-        # form = ApplyLeave.get_form(request)
-        # # user_leaves = Leave.objects.filter(applicant=request.user)
-        # leaves_count = LeavesCount.objects.get(user=request.user)
-        # context ={
-        #     'form': form,
-        #     # 'user_leaves': user_leaves,
-        #     'leaves_count': leaves_count,
-        # }
-        #
-        # # applications = GetApplications.get(request)
-        # # context.update(applications)
-        # # return render(request, 'leave_application/apply_for_leave.html', {'form': form, 'title': 'Leave', 'action':'Apply'})
-        # return render(request, 'fusion/leaveModule0/leaveapplicationform.html', context)
+        # TODO: Take another value as action so that action can specify edit or delete with same
         return redirect('/leave/')
 
     def post(self, request):
@@ -132,6 +102,8 @@ class ApplyLeave(View):
                     admin_done = admin_done,
                     leave_address = form.cleaned_data.get('leave_address', ''),
                     start_date = form.cleaned_data['start_date'],
+                    station_start_date = form.cleaned_data.get('station_start_date'),
+                    station_end_date = form.cleaned_data.get('station_end_date'),
                     end_date = form.cleaned_data['end_date'],
                     station = form.cleaned_data.get('station_leave'),
                 )
@@ -140,15 +112,15 @@ class ApplyLeave(View):
                 return render(request,
                               'leave_application/apply_for_leave.html',
                               {'form': form, 'message': 'Failed'})
-            # return render(request, 'leave_application/apply_for_leave.html', {'message': 'success', 'title': 'Leave', 'action':'Apply'})
+
             return redirect('/leave/?message=success')
-            # return render(request, 'fusion/leaveModule0/leave.html', {'message': 'success', 'title': 'Leave', 'action':'Apply'})
+
         else:
             context = {'form': form, 'title': 'Leave', 'action':'Apply'}
-            leaves_count = LeavesCount.objects.get(user=request.user)
+            year = datetime.date.today().year
+            leaves_count = LeavesCount.objects.get(user=request.user, year=year)
             context['leaves_count'] = leaves_count
             context.update(GetApplications.get_reps(request))
-            leaves_count = LeavesCount.objects.get(user=request.user)
             return render(request, 'fusion/leaveModule0/leave.html', context)
 
     @classmethod
@@ -180,13 +152,9 @@ class ApplyLeave(View):
 
 class ProcessRequest(View):
 
-    # def post(self, request, id):
-    #     print(request.POST)
-    #     return JsonResponse({'response': 'ok'}, status=200)
-
     def post(self, request, id):
         leave_request = get_object_or_404(CurrentLeaveRequest, id=id)
-        #print(request.POST)
+
         do = request.POST.get('do')
 
         response = JsonResponse({'response': 'Failed'}, status=400)
@@ -208,7 +176,7 @@ class ProcessRequest(View):
         type_of_leave = leave_request.leave.type_of_leave
         sanc_auth = leave_request.applicant.extrainfo.sanctioning_authority
         sanc_officer = leave_request.applicant.extrainfo.sanctioning_officer
-        remark = request.GET.get('remark', '')
+        remark = request.POST.get('remark', '')
         response = JsonResponse({'response': 'ok'}, status=200)
 
         if leave_request.permission in ['academic', 'admin']:
@@ -230,7 +198,6 @@ class ProcessRequest(View):
                     permission = 'sanc_auth',
                     position = position,
                     leave = leave_request.leave,
-                    station = leave_request.station,
                 )
 
         elif sanc_auth == sanc_officer or leave_request.permission == 'sanc_officer':
@@ -247,7 +214,7 @@ class ProcessRequest(View):
         return response
 
     def reject(self, request, leave_request):
-        remark = request.GET.get('remark', '')
+        remark = request.POST.get('remark', '')
 
         type_of_leave = leave_request.leave.type_of_leave
         response = JsonResponse({'response': 'ok',}, status=200)
@@ -272,7 +239,7 @@ class ProcessRequest(View):
 
     def forward(self, request, leave_request):
 
-        remark = request.GET.get('remark', '')
+        remark = request.POST.get('remark', '')
         type_of_leave = leave_request.leave.type_of_leave
 
         response = JsonResponse({'response': 'ok',}, status=200)
@@ -291,7 +258,6 @@ class ProcessRequest(View):
                     applicant = leave_request.applicant,
                     requested_from = next_user,
                     position = position,
-                    station = leave_request.station,
                     leave = leave_request.leave,
                     permission = 'sanc_officer',
                 )
@@ -304,13 +270,20 @@ class ProcessRequest(View):
 
     @transaction.atomic
     def create_leave_request(self, cur_leave_request, final, accept=False, remark=''):
+        if cur_leave_request.leave.type_of_leave not in ['casual', 'restricted'] and \
+            cur_leave_request.permission == 'sanc_auth':
+            status = True
+        else:
+            status = accept
+
         leave_request = LeaveRequest.objects.create(
             leave = cur_leave_request.leave,
             applicant = cur_leave_request.applicant,
             requested_from = cur_leave_request.requested_from,
             remark = remark,
+            permission = cur_leave_request.permission,
             position = cur_leave_request.position,
-            status = accept,
+            status = status,
         )
 
         if not accept and final:
@@ -324,8 +297,7 @@ class ProcessRequest(View):
 
                 remain = getattr(count, cur_leave_request.leave.type_of_leave)
                 required_leaves = cur_leave_request.leave.count_work_days
-                # print(required_leaves, remain)
-                # return True
+
                 if remain < required_leaves:
                     cur_leave_request.leave.status = 'rejected'
                 else:
@@ -365,8 +337,6 @@ class ProcessRequest(View):
 
                 remain = getattr(count, cur_leave_request.leave.type_of_leave)
                 required_leaves = cur_leave_request.leave.count_work_days
-                # print(required_leaves, remain)
-                # return True
                 if remain < required_leaves:
                     cur_leave_request.leave.status = 'rejected'
                 else:
@@ -401,19 +371,9 @@ class ProcessRequest(View):
 
     @transaction.atomic
     def create_migration(self, leave):
-        import datetime
 
         if leave.start_date <= datetime.date.today():
-            # Replacement.objects.create(
-            #     replacee = leave.applicant,
-            #     replacer = leave.academic_replacement,
-            #     replacement_type = 'academic',
-            # )
-            # Replacement.objects.create(
-            #     replacee = leave.applicant,
-            #     replacer = leave.administrative_replacement,
-            #     replacement_type = 'administrative',
-            # )
+
             if leave.applicant.extrainfo.user_type == 'faculty':
                 r1 = Replacement.objects.create(
                     replacee = leave.applicant,
@@ -442,8 +402,6 @@ class ProcessRequest(View):
             )
 
         else:
-            # if leave.start_date not in to_be.migrations.keys():
-                # to_be.migrations[leave.start_date] = []
             if leave.applicant.extrainfo.user_type == 'faculty':
                 LeaveMigration.objects.create(
                     type = 'add',
@@ -487,19 +445,12 @@ class GetApplications():
                                                               | Q(permission='admin')))
             request_list += [cls.should_forward(request, q_obj) for q_obj in reqs]
 
-        # print(rep_requests)
+
         context = {
             'processed_request_list': processed_request_list,
             'request_list': request_list,
         }
         return context
-
-        #count = len(request_list)
-        # return render(request, 'leave_application/get_requests.html', {'requests': request_list,
-        #                                                               'title':'Leave',
-        #                                                               'action':'ViewRequests',
-        #                                                               'count':count,
-        #                                                               'prequests':prequest_list})
 
     @classmethod
     def get_count(cls, request):
@@ -515,14 +466,14 @@ class GetApplications():
                                                     | Q(permission='admin'))).exists()
         if reqs:
             return reqs
-        #reqeust_list = []
+
         for replacement in replacements:
             replacee = replacement.replacee
             reqs = CurrentLeaveRequest.objects.filter((Q(requested_from=request.user)
                                                               | Q(requested_from=replacee))
                                                               & ~(Q(permission='academic')
                                                               | Q(permission='admin'))).exists()
-            # print(reqs)
+
             if reqs:
                 return True
 
@@ -564,21 +515,3 @@ class GetLeaves(View):
                                                                      'count':count,
                                                                      'title':'Leave',
                                                                      'action':'ViewLeaves'})
-
-
-
-"""
-
-$.ajax({
-    type: 'delete',
-    url: '/leave/apply',
-    data: {'id': 17},
-    success: function(data){
-        alert(data.message);
-    },
-    error: function(err){
-        alert('error');
-    }
-});
-
-"""

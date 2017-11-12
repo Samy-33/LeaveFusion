@@ -8,6 +8,8 @@ urlpatterns = [
     url(r'uploadcsv/$', views.upload_file),
     url(r'^profile/$', views.profile, name='profile'),
 
+    url(r'^rspc_profile/$', views.rspc_profile, name='rspc_profile'),
+
     #delete
     url(r'^achv/(?P<pk>[0-9]+)/$', views.achievementDelete, name='achievement_delete'),
     url(r'^emp_confrence_organisedDelete/(?P<pk>[0-9]+)/$', views.emp_confrence_organisedDelete, name='emp_confrence_organisedDelete'),
@@ -48,5 +50,6 @@ urlpatterns = [
 
     # generate report
     url(r'^report/$', views.generate_report, name='generate_report'),
+    url(r'^rspc_report/$', views.rspc_generate_report, name='rspc_generate_report'),
 
 ]

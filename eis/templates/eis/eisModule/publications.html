@@ -177,10 +177,14 @@
         <div class="ui pointing pagination menu">
                 {% for j in journal %}
                 {% if forloop.counter0|divisibleby:10 %}
-                    <span align="right>"><a class="{% if forloop.counter0 == 0 %}active {% endif %}item" data-tab="j-{{ forloop.counter0 }}">
+                    <span align="right"><a class="{% if forloop.counter0 == 0 %}active {% endif %}item" data-tab="j-{{ forloop.counter0 }}">
                         {% widthratio forloop.counter|add:10 10 1 %}
-     </a></span>
+
+     </a></span>{% if forloop.counter0|divisibleby:10 %}
+                        <br>
+                        {% endif %}
                 {% endif %}
+
                 {% endfor %}
 
             </div>
@@ -195,9 +199,9 @@
                 <th class="sorted ascending" style="width: 7%;">Sr.</th>
                 <th class="" style="width: 20%;" >Authors</th>
                 <th class="" style="width: 20%;">Title of Paper</th>
-                <th class="" style="width: 37%;">Journal Details</th>
+                <th class="" style="width: 33%;">Journal Details</th>
 
-                <th class="" style="width: 8%;">Year</th>
+                <th class="" style="width: 12%;">Year</th>
                 <th class="" style="width: 8%;">Action</th>
             </tr>
             </thead>
@@ -424,9 +428,9 @@
                  <th class="sorted ascending" style="width: 7%;">Sr.</th>
                 <th class="" style="width: 20%;" >Authors</th>
                 <th class="" style="width: 20%;">Title of Paper</th>
-                <th class=""  style="width: 37%;">Conference Details</th>
+                <th class=""  style="width: 33%;">Conference Details</th>
 
-                <th class="" style="width: 8%;">Year</th>
+                <th class="" style="width: 12%;">Year</th>
                 <th class="" style="width: 8%;">Action</th>
             </tr>
             </thead>
@@ -585,10 +589,10 @@
                   <th class="sorted ascending" style="width: 7%;">Sr.</th>
                 <th class="" style="width: 20%;" >Published</th>
                 <th class="" style="width: 20%;">Title of Paper</th>
-                <th class=""  style="width: 20%;">Publisher</th>
+                <th class=""  style="width: 17%;">Publisher</th>
 
 
-                <th class="" style="width: 8%;">Year</th>
+                <th class="" style="width: 11%;">Year</th>
                 <th style="width:17%">Co-authors</th>
                 <th class="" style="width: 8%;">Action</th>
             </tr>

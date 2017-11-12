@@ -70,10 +70,15 @@
 
                                 <div class="menu">
                                     {% for value,name in form.fields.type_of_leave.widget.choices %}
-                                        <div class="item" id="drop-{{ value }}" data-value="{{ value }}">
-                                            {{ name }}
-                                        </div>
-
+                                        {% if request.user.extrainfo.user_type != 'staff' %}
+                                            <div class="item" id="drop-{{ value }}" data-value="{{ value }}">
+                                                {{ name }}
+                                            </div>
+                                        {% elif value != 'vacation' %}
+                                            <div class="item" id="drop-{{ value }}" data-value="{{ value }}">
+                                                {{ name }}
+                                            </div>
+                                        {% endif %}
                                     {% endfor %}
                                 </div>
                             </div>
@@ -90,13 +95,38 @@
                         </div>
 
                     </div>
-
-                    <div class="fields">
-                        <div class="sixteen wide field" id="leaveAddress" style="display: none;">
-                            <label>Leave Address:</label>
-                            <!-- <textarea class="ui textarea" rows="2"></textarea> -->
-                            <textarea class="ui textarea" rows="1" name="leave_address" id="id_leave_address"></textarea>
+                    <div id="station_area" style="display: none;">
+                        <div class="two fields">
+                            <div class="field">
+                                <label>Station Leave From:</label>
+                                <div class="ui calendar" id="st_rangestart">
+                                    <div class="ui input left icon">
+                                        <i class="calendar icon"></i>
+                                        <!-- <input name="start_date" type="text" placeholder="From"> -->
+                                        {{ form.station_start_date }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>Station Leave To:</label>
+                                <div class="ui calendar" id="st_rangeend">
+                                    <div class="ui input left icon">
+                                        <i class="calendar icon"></i>
+                                        <!-- <input name="end_date" type="text" placeholder="To"> -->
+                                        {{ form.station_end_date }}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
+                            <div class="fields">
+                                <div class="sixteen wide field">
+                                    <label>Leave Address:</label>
+                                    <!-- <textarea class="ui textarea" rows="2"></textarea> -->
+                                    <textarea class="ui textarea" rows="1" name="leave_address" id="id_leave_address"></textarea>
+                                </div>
+                            </div>
+
                     </div>
 
                     <div>
@@ -178,7 +208,7 @@
                 </div>
             </form>
             {% else %}
-                Successfully submitted the leave application
+                <h1><div class='ui message success'> Successfully submitted the leave application</div><h1>
             {% endif %}
     </div>
 
@@ -258,15 +288,27 @@
         </div>
 
     </div>
+    <div class='ui info message'>
+        <b class='ui header'>NOTES:</b>
+        <li><b> Leave Balance will be updated once application is accepted. </b>
+        <li><b> To take different types of leaves, apply separately for each of them. </b>
+        <li><b> To divide your leave period with multiple Replacees, apply separately for each of them.</b>
 
-    <b><u>NOTE:</u> Leave Balance will be updated once application is accepted. </b>
+    </div>
 </div>
 
 <script type="text/javascript">
     function ShowHideDiv() {
         var station_leave = document.getElementById("id_station_leave");
-        var leaveAddress = document.getElementById("leaveAddress");
-        leaveAddress.style.display = station_leave.checked ? "block" : "none";
+        // var station_area = document.getElementById("station_area");
+        var station_area = $('#station_area');
+        if(station_leave.checked){
+            station_area.slideDown();
+        }
+        else{
+            station_area.slideUp();
+        }
+        // station_area.style.display = station_leave.checked ? "block" : "none";
     }
     $(document).ready(function(){
         window.history.replaceState(null, null, window.location.pathname);

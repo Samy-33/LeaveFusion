@@ -1,0 +1,70 @@
+<div style='font-size: 40px;' class="left aligned"><b style='color: green;'>Purpose</b>: {{ leave.purpose }} </div><br>
+
+{% if leave.station %}
+    <div style='font-size: 30px;' class="left aligned"><b style='color: green;'> Station Leave From: </b> {{ leave.station_start_date }}</div>
+    <div style='font-size: 30px;' class="left aligned"><b style='color: green;'> Station Leave To: </b> {{ leave.station_end_date }}</div>
+{% endif %}
+
+<table class="ui selectable inverted table">
+  <br>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Remark</th>
+      <th class="right aligned">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+
+  {% for reqs in leave.requests.all %}
+  <tr>
+    <td>{{reqs.requested_from.first_name}} {{ reqs.requested_from.last_name }} </td>
+    <td>{% if reqs.permission == 'academic' %} Academic Responsibility
+        {% elif reqs.permission == 'admin' %} Administratice Responsibility
+        {% else %} {{ reqs.requested_from.extrainfo.designation }}
+        {% endif %}
+    </td>
+    <td>
+        {% if reqs.remark != '.' and not reqs.status %}
+            {% if request.user.extrainfo.designation.name == 'Director' or request.user == reqs.requested_from or request.user == reqs.applicant %}
+                {{ reqs.remark }}
+            {% else %} Hidden or Unspecified
+            {% endif %}
+        {% else %}
+          Hidden or Unspecified
+        {% endif %}
+
+    </td>
+    <td class="right aligned">
+        {% if reqs.status %} Accepted {% else %} Rejected {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+
+    {% for reqs in leave.cur_requests.all %}
+    <tr>
+      <td>{{ reqs.requested_from.first_name }} {{ reqs.requested_from.last_name }} </td>
+      <td>{% if reqs.permission == 'academic' %} Academic Responsibility
+          {% elif reqs.permission == 'admin' %} Administratice Responsibility
+          {% else %} {{ reqs.requested_from.extrainfo.designation }}
+          {% endif %}
+      </td>
+      <td>
+          {% if reqs.remark != '.' %}
+              {% if request.user.extrainfo.designation.name == 'Director' or request.user == reqs.requested_from or request.user == reqs.applicant %}
+                  {{ reqs.remark }}
+              {% else %} Hidden or Unspecified
+              {% endif %}
+          {% else %}
+            Hidden or Unspecified
+          {% endif %}
+      </td>
+      <td class="right aligned">
+          Pending
+      </td>
+    </tr>
+    {% endfor %}
+
+  </tbody>
+</table>

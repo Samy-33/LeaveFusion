@@ -9,7 +9,7 @@ from PIL import Image
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 
-from leave_application.models import CurrentLeaveRequest
+from leave_application.models import CurrentLeaveRequest, LeavesCount
 
 from django.contrib.auth import logout as logout_func
 
@@ -109,3 +109,26 @@ def make_migrations():
                 migration.rep.delete()
         last_date.last_date_change = today
         last_date.save()
+    yearly_migration()
+
+def yearly_migration():
+    date = MigrationChangeDate.objects.all().first()
+    curr_year = datetime.date.today().year
+    if date.last_commute_year < curr_year:
+        to_create = []
+        users = User.objects.all()
+        for user in users:
+            if user.extrainfo.user_type != 'student':
+                leaves = user.count_of_leaves.all()
+                curr = leaves.get(year=curr_year-1)
+                agla = leaves.get(year=curr_year)
+                agla.commuted += curr.commuted
+                agla.earned += int(curr.vacation/2)
+                agla.earned += int(curr.earned)
+                agla.save()
+                to_create.append(LeavesCount(user=user, year=curr_year+2))
+
+        LeavesCount.objects.filter(year=curr-1).delete()
+        LeavesCount.objects.bulk_create(to_create)
+        date.year = curr_year
+        date.save()

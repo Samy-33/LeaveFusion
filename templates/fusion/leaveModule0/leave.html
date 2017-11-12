@@ -332,6 +332,14 @@
                 type: 'date',
                 startCalendar: $('#rangestart'),
             });
+            $('#st_rangestart').calendar({
+                type: 'date',
+                endCalendar: $('#st_rangeend'),
+            });
+            $('#st_rangeend').calendar({
+                type: 'date',
+                startCalendar: $('#st_rangestart'),
+            });
             $('.ui.checkbox')
                 .checkbox()
             ;
@@ -388,7 +396,7 @@
                 success: function(data){
                     // alert(data);
                     $('#main_active').html(data);
-                    addAttr();
+                    // addAttr();
                     $('#leave_status').addClass('active');
                     $('#leave_application').removeClass('active');
                     $('#leave_approve').removeClass('active');
@@ -413,7 +421,7 @@
                 success: function(data){
                     // alert(data);
                     $('#main_active').html(data);
-                    addAttr();
+                    // addAttr();
                     $('#leave_application').removeClass('active');
                     $('#leave_status').removeClass('active');
                     $('#leave_approve').addClass('active');
@@ -434,28 +442,7 @@
                     pk: primary_key
                 },
                 success: function(data){
-
-                    html = '<table class="ui selectable inverted table"> <thead>\
-                        <tr> \
-                          <th>Name</th>\
-                          <th>Designation</th>\
-                          <th class="right aligned">Status</th>\
-                        </tr>\
-                      </thead>\
-                      <tbody>';
-                    for( var i=0; i < data.length; i++){
-                        var req = data[i];
-                        html += '<tr><td>' + req.name + '</td><td>' + req.type + '<td class="right aligned">';
-                        if( req.status == 'pending'){
-                            html += '<span class="orange">PENDING</span></td>';
-                        }
-                        else if(req.status == true){
-                            html += '<span class="green">ACCEPTED</span></td>';
-                        }
-                        else html += '<span class="red">REJECTED</span></td>';
-                    }
-                    html += '</tr> </tbody> </table>';
-                    modal.find('.content').html(html);
+                    modal.find('.content').html(data);
                     modal.modal('show');
                 },
                 error: function(data, err){

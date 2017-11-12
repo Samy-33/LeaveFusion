@@ -48,11 +48,6 @@
             <div class="ui huge fluid vertical pointing menu"
                  style="max-width: 320px;">
 
-                <a class="active item" data-tab="first">
-                    Personal Details
-                    <i class="right floated chevron right icon"></i>
-                </a>
-
                 <a class="item" data-tab="second">
                     Publications
                     <i class="right floated chevron right icon"></i>
@@ -89,8 +84,8 @@
 
 
                 {% if request.user.extrainfo.designation.name == "Dean (RSPC)" %}
-                <a class="item" href="/eis/rspc_profile/">
-                    Dean (RSPC)
+                <a class="item" href="/eis/profile/">
+                    Personal Profile
                     <i class="right floated chevron right icon"></i>
                 </a>
                 {% endif %}
@@ -108,21 +103,14 @@
         {% comment %}
             The central-rail segment starts here!
         {% endcomment %}
-        <div class="eight wide column">
-            {% comment %}The Details start here!{% endcomment %}
-            <div class="ui active tab segment" data-tab="first">
-                {% block personaldetails %}
-                    {% include 'eis/eisModule/personaldetails.html' %}
-                {% endblock %}
-            </div>
-            {% comment %}The Personal Details end here!{% endcomment %}
+        <div class="seven wide column">
 
 
             {% comment %}The Publications starts here!{% endcomment %}
 
-            <div class="ui tab segment" data-tab="second">
+            <div class="ui active tab segment" data-tab="second">
                 {% block publications %}
-                    {% include 'eis/eisModule/publications.html' %}
+                    {% include 'eis/eisModule/rspc_publications.html' %}
                 {% endblock %}
             </div>
 
@@ -133,7 +121,7 @@
 
             <div class="ui tab segment" data-tab="third">
                 {% block projects %}
-                    {% include 'eis/eisModule/projects.html' %}
+                    {% include 'eis/eisModule/rspc_projects.html' %}
                 {% endblock %}
             </div>
 
@@ -144,7 +132,7 @@
 
             <div class="ui tab segment" data-tab="fourth">
                 {% block thesis %}
-                    {% include 'eis/eisModule/thesis.html' %}
+                    {% include 'eis/eisModule/rspc_thesis.html' %}
                 {% endblock %}
             </div>
 
@@ -154,7 +142,7 @@
 
             <div class="ui tab segment" data-tab="fifth">
                 {% block eventorganised %}
-                    {% include 'eis/eisModule/eventorganized.html' %}
+                    {% include 'eis/eisModule/rspc_eventorganized.html' %}
                 {% endblock %}
             </div>
 
@@ -164,7 +152,7 @@
 
             <div class="ui tab segment" data-tab="sixth">
                 {% block visits %}
-                    {% include 'eis/eisModule/visits.html' %}
+                    {% include 'eis/eisModule/rspc_visits.html' %}
                 {% endblock %}
             </div>
             {% comment %}The visits ends here!{% endcomment %}
@@ -172,7 +160,7 @@
             {% comment %}The conference starts here!{% endcomment %}
             <div class="ui tab segment" data-tab="seventh">
                 {% block conference %}
-                    {% include 'eis/eisModule/conference.html' %}
+                    {% include 'eis/eisModule/rspc_conference.html' %}
                 {% endblock %}
             </div>
             {% comment %}The conference ends here!{% endcomment %}
@@ -180,7 +168,7 @@
             {% comment %}The others starts here!{% endcomment %}
             <div class="ui tab segment" data-tab="eigth">
                 {% block others %}
-                    {% include 'eis/eisModule/others.html' %}
+                    {% include 'eis/eisModule/rspc_others.html' %}
                 {% endblock %}
             </div>
             {% comment %}The others ends here!{% endcomment %}
@@ -195,7 +183,7 @@
             <div class="row">
                 {% comment %}The Modules:{% endcomment %}
                 {% block generatereport %}
-                    {% include 'eis/eisModule/generatereport.html' %}
+                    {% include 'eis/eisModule/rspc_generatereport.html' %}
                 {% endblock %}
             </div>
 
@@ -272,7 +260,7 @@
             $('#example2e').calendar({
           type: 'date'
         });
-            
+
            $('#example2f').calendar({
           type: 'date'
         });
@@ -281,7 +269,7 @@
         });
           $('#example2h').calendar({
           type: 'date'
-        });   
+        });
 
 
         $('#example3').calendar({
@@ -428,7 +416,7 @@
             }
            }
 
-     
+
            function myFunction2() {
             var x = document.getElementById("myDIV1");
             if (x.style.display === "none") {
@@ -502,7 +490,7 @@ function getData(_row){
         }
     }
 }
-              
+
 
 function updatePHD(_row){
     var p = document.getElementById("phd"+_row+"Z").innerHTML.search(">");

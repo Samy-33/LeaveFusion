@@ -16,7 +16,7 @@ class Constants:
     )
 
 class LeavesCount(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='count_of_leaves', on_delete=models.CASCADE)
     year = models.IntegerField(default=2017)
     casual = models.IntegerField(default=8)
     special_casual = models.IntegerField(default=15)
@@ -95,6 +95,7 @@ class CurrentLeaveRequest(models.Model):
     leave = models.ForeignKey(Leave, related_name='cur_requests', on_delete=models.CASCADE)
     permission = models.CharField(max_length=20, default='other')
     station = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return '{} requested from {}'.format(self.applicant.username, self.requested_from.username)
@@ -112,8 +113,8 @@ class LeaveRequest(models.Model):
     leave = models.ForeignKey(Leave, related_name='requests', on_delete=models.CASCADE)
     # both = models.BooleanField(default=False)
     remark = models.CharField(max_length=200, blank=False, default='')
+    permission = models.CharField(max_length=20, default='other')
     status = models.BooleanField(default=False)
-    station = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
