@@ -10,11 +10,16 @@ from leave_application.models import (Leave, CurrentLeaveRequest,
                                       LeaveRequest, LeavesCount,
                                       LeaveMigration,)
 from django.contrib.auth.models import User
+
+from eis.views import render_to_pdf
+
 from leave_application.helpers import FormData, get_object_or_none, count_work_days
 from django.db.models import Q
 from django.db import transaction
 import datetime
 import json
+from django.contrib.auth.decorators import login_required
+
 
 class LeaveView(View):
 
@@ -25,13 +30,15 @@ class LeaveView(View):
             leaves_count = LeavesCount.objects.get(user=request.user, year=curr_year)
             applications = GetApplications.get_reps(request)
             message = request.GET.get('message', None)
+            leave_id = request.GET.get('leave_id', None)
             form = ApplyLeave.get_form(request) if not message else None
             received_requests = GetApplications.get_count(request)
             context = {
                 'form': form,
                 'leaves_count': leaves_count,
                 'message': message,
-                'show_approve': received_requests
+                'show_approve': received_requests,
+                'leave_id': leave_id
             }
             context.update(applications)
             return render(request, 'fusion/leaveModule0/leave.html', context)
@@ -113,7 +120,7 @@ class ApplyLeave(View):
                               'leave_application/apply_for_leave.html',
                               {'form': form, 'message': 'Failed'})
 
-            return redirect('/leave/?message=success')
+            return redirect('/leave/?message=success&leave_id={}'.format(leave_obj.id))
 
         else:
             context = {'form': form, 'title': 'Leave', 'action':'Apply'}
@@ -505,10 +512,25 @@ class GetApplications():
             obj.forward = False
         return obj
 
+
+@login_required(login_url='/accounts/login')
+def generate_pdf(request):
+    id = request.GET.get('id', None)
+    if not id:
+        return Http404
+
+    leave = get_object_or_404(Leave, pk=id)
+
+    if not leave or leave.applicant != request.user:
+        return Http404
+    date = datetime.date.today()
+    # return render(request, 'fusion/leaveModule0/generatePDF.html', {'leave': leave, 'date': date})
+    return render_to_pdf('fusion/leaveModule0/generatePDF.html', {'leave': leave, 'request': request, 'date': date})
+
+
 class GetLeaves(View):
 
     def get(self, request):
-
         leave_list = Leave.objects.filter(applicant=request.user).order_by('-id')
         count = len(list(leave_list))
         return render(request, 'leave_application/get_leaves.html', {'leaves':leave_list,

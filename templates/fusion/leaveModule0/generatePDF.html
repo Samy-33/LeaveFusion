@@ -1,0 +1,79 @@
+
+<html>
+
+    <head><style>
+
+</style>
+    </head>
+    <body style='font-size: 15px;'>
+
+        <header 'left aligned'>
+            {{ date }}
+        </header><br>
+        <center>
+            <b>PDPM Indian Institute of Information Technology Design and Manufacturing, Jabalpur</b><br>
+            <b><u> Leave Application Form </u> </b>
+            <hr>
+        </center><br>
+        <table style='border: None; padding-top: 10px;'>
+          <tbody>
+            <tr>
+              <td>Applicant: </td>
+              <td> <u>{{ request.user.first_name }} {{ request.user.last_name }}</u> </td>
+            </tr>
+            <tr>
+              <td>Designation: </td>
+              <td class='right aligned'> <u>{{ request.user.extrainfo.designation.name }}</u> </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>Leave Applied For: </td>
+              <td> {{ leave.start_date }}  to </td>
+              <td> {{ leave.end_date }} </td>
+            </tr>
+            <tr>
+              <td> Station Leave: </td>
+              <td> {{ leave.station_start_date }}  to </td>
+              <td> {{ leave.station_end_date }} </td>
+            </tr>
+            <tr>
+                <td> Leave Type: </td>
+                <td> {{leave.type_of_leave}}</td>
+                <td></td>
+
+            <tr>
+              <td> Purpose: </td>
+
+                <td>{{ leave.purpose }}</td>
+            </tr>
+
+            <tr>
+              <td> Academic Responsibility To: </td>
+
+                <td>{{ leave.academic_replacement.first_name }} {{ leave.academic_replacement.last_name }}</td>
+                <td> ___________________</td>
+            </tr>
+            <tr>
+              <td> Administrative Responsibility To: </td>
+
+                <td>{{ leave.administrative_replacement.first_name }} {{ leave.administrative_replacement.last_name }}</td>
+                <td> ___________________</td>
+            </tr>
+            <tr>
+                <td> Sign</td>
+                <td></td>
+                <td>Sign Officer/Incharge </td>
+            </tr>
+            <tr>
+                <td>_________________</td>
+                <td></td>
+                <td> _______________________</td>
+            </tr>
+          </tbody>
+        </table>
+        <hr>
+        <b>Leave Address: </b> {{ leave.leave_address }}
+
+
+    </body>
+</html>
