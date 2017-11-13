@@ -51,13 +51,13 @@
               <td> Academic Responsibility To: </td>
 
                 <td>{{ leave.academic_replacement.first_name }} {{ leave.academic_replacement.last_name }}</td>
-                <td> ___________________</td>
+                <td> ..........................................</td>
             </tr>
             <tr>
               <td> Administrative Responsibility To: </td>
 
                 <td>{{ leave.administrative_replacement.first_name }} {{ leave.administrative_replacement.last_name }}</td>
-                <td> ___________________</td>
+                <td> ..........................................</td>
             </tr>
             <tr>
                 <td> Sign</td>
@@ -65,14 +65,63 @@
                 <td>Sign Officer/Incharge </td>
             </tr>
             <tr>
-                <td>_________________</td>
+                <td>..........................................</td>
                 <td></td>
-                <td> _______________________</td>
+                <td> ..........................................</td>
             </tr>
           </tbody>
         </table>
         <hr>
         <b>Leave Address: </b> {{ leave.leave_address }}
+        <hr>
+        <style>
+            .balance{
+                border: 1px black solid;
+            }
+        </style>
+        For Office Use only
+        <table class='balance' style='padding-top: 5px; text-align: center;'>
+            <caption class=''> Leave Balance </caption>
+            <tr>
+                <th> CL </th>
+                <th> RH </th>
+                <th> EL/VL </th>
+                <th> SCL </th>
+                <th> Commuted </th>
+                <th> Year </th>
+            </tr>
+            <tr>
+                <td>..........</td>
+                <td>..........</td>
+                <td>..........</td>
+                <td>..........</td>
+                <td>..........</td>
+                <td>..........</td>
+            </tr>
+        </table>
+        <br>
+        <table>
+            <tr>
+                <td> Dealing Assistant </td>
+                <td> Assistant Registrar </td>
+            </tr>
+            <tr style='padding-top: 10px;'>
+                <td> ...................................................... </td>
+                <td> ...................................................... </td>
+            </tr>
+            <tr style='padding-top: 15px;'>
+                <td>Leave Sanctioned / Not Sanctioned</td>
+            </tr>
+            <tr style='padding-top: 5px;'>
+                <td>..........................................................................................</td>
+            </tr>
+            <tr style='padding-top: 15px;'>
+                <td>Diretor / Dean / HOD / Registrar / Deputy Registrar</td>
+            </tr>
+            <tr style='padding-top: 5px;'>
+                <td>..........................................................................................</td>
+            </tr>
+        </table>
 
 
     </body>
